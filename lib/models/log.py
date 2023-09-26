@@ -52,9 +52,9 @@ class Log:
         sql = """
             CREATE TABLE IF NOT EXISTS logs (
             id INTEGER PRIMARY KEY,
-            user_id INTEGER,
-            exercise_id INTEGER,
-            date TEXT,
+            user_id TEXT,
+            exercise_id TEXT,
+            date INT,
             FOREIGN KEY (user_id) REFERENCES users(id),
             FOREIGN KEY (exercise_id) REFERENCES exercises(id))        
         """
