@@ -25,10 +25,10 @@ class Exercise:
 
     @name.setter
     def name(self, name):
-        if isinstance(name, str) and name:
+        if isinstance(name, str) and 0 < len(name) <= 20:
             self._name = name
         else:
-            raise Exception("Invalid name")
+            raise Exception("Invalid name. Name must be a string greater than 0 and less than 20 characters.")
 
     @property
     def time(self):
@@ -40,7 +40,7 @@ class Exercise:
         if isinstance(time, int) and 0 < time:
             self._time = time
         else:
-            raise Exception("Invalid time")
+            raise Exception("Invalid duration. Duration must be a number greater than 0.")
         
     @property
     def category(self):
@@ -51,7 +51,7 @@ class Exercise:
         if category in Exercise.CATEGORY:
             self._category = category
         else:
-            raise Exception("Invalid category")
+            raise Exception("Invalid category. Please select between Cardio or Strength.")
 
     @property
     def intensity(self):
@@ -62,7 +62,7 @@ class Exercise:
         if intensity in Exercise.INTENSITY:
             self._intensity = intensity
         else:
-            raise Exception("Invalid intensity")
+            raise Exception("Invalid intensity. Please select either Beginner, Intermediate, Advanced.")
 
     @property
     def cals_burned(self):
@@ -74,7 +74,7 @@ class Exercise:
         if isinstance(cals_burned, int) and 0 < cals_burned:
             self._cals_burned = cals_burned
         else:
-            raise Exception("Invalid calories")
+            raise Exception("Invalid calories. Calories must be a number greater than 0.")
 
     @classmethod
     def create_table(cls):
