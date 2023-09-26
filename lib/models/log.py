@@ -1,59 +1,114 @@
 from models.__init__ import CURSOR, CONN
-from user import User
-from exercise import Exercise 
-
-import datetime # Allows us to work with dates and times
+from models.user import User
+from models.exercise import Exercise
 
 class Log:
     def __init__(self): 
         self.entries = [] # An empty list that will store the exercise log entries
 
-    def create_log_entry(self, user, exercise, date): # Creates a new log entry + checks the type of object
+    def create_log_entry(self, user, exercise, date):
         if not isinstance(user, User):
             raise ValueError("Invalid user object provided.")
         if not isinstance(exercise, Exercise):
             raise ValueError("Invalid exercise object provided.")
-        if not isinstance(date, datetime.datetime):
-            raise ValueError("Invalid date object provided.")
 
-        log_entry = {"user": user, "exercise": exercise, "date": date} # Creates a dict to contain the user, exercise and date
-        self.entries.append(log_entry) # Appends the dict to the "entries" list
+        sql = """
+            INSERT INTO logs (user_id, exercise_id, date)
+            VALUES (?, ?, ?)
+        """
 
-    def read_log_entries(self): # Returns the list of long entries 
-        return self.entries
+        CURSOR.execute(sql, (user.id, exercise.id, date))
+        CONN.commit()
 
-    def find_entry_by_id(self, entry_id): # Returns a matching entry by its Id
-        for entry in self.entries:
-            if entry.get("id") == entry_id:
-                return entry
-        return None
+    @classmethod
+    def read_log_entries(cls):
+        sql = """
+            SELECT logs.id, users.name, exercises.name, logs.date
+            FROM logs
+            INNER JOIN users ON logs.user_id = users.id
+            INNER JOIN exercises ON logs.exercise_id = exercises.id
+        """
 
-    def update_log_entry(self, index, user=None, exercise=None, date=None): # To update an entry 
-        if index < 0 or index >= len(self.entries):
-            raise IndexError("Index out of range.")
+        CURSOR.execute(sql)
+        rows = CURSOR.fetchall()
 
-        log_entry = self.entries[index]
+        entries = []
+        for row in rows:
+            entry = {
+                "id": row[0],
+                "user": row[1],
+                "exercise": row[2],
+                "date": row[3]
+            }
+            entries.append(entry)
 
-        if user is not None:
-            if not isinstance(user, User):
-                raise ValueError("Invalid user object provided.")
-            log_entry["user"] = user
+        return entries
 
-        if exercise is not None:
-            if not isinstance(exercise, Exercise):
-                raise ValueError("Invalid exercise object provided.")
-            log_entry["exercise"] = exercise
+    @classmethod
+    def find_entry_by_id(cls, entry_id):
+        sql = """
+            SELECT logs.id, users.name, exercises.name, logs.date
+            FROM logs
+            INNER JOIN users ON logs.user_id = users.id
+            INNER JOIN exercises ON logs.exercise_id = exercises.id
+            WHERE logs.id = ?
+        """
 
-        if date is not None:
-            if not isinstance(date, datetime.datetime):
-                raise ValueError("Invalid date object provided.")
-            log_entry["date"] = date
+        CURSOR.execute(sql, (entry_id,))
+        row = CURSOR.fetchone()
 
-    def delete_log_entry(self, index): # Delete a log entry
-        if index < 0 or index >= len(self.entries):
-            raise IndexError("Index out of range.")
+        if row:
+            entry = {
+                "id": row[0],
+                "user": row[1],
+                "exercise": row[2],
+                "date": row[3]
+            }
+            return entry
+        else:
+            return None
 
-        del self.entries[index]
+    @classmethod
+    def update_log_entry(cls, entry_id, user=None, exercise=None, date=None):
+        sql = """
+            UPDATE logs
+            SET user_id = COALESCE(?, user_id), exercise_id = COALESCE(?, exercise_id), date = COALESCE(?, date)
+            WHERE id = ?
+        """
 
-    def __str__(self): # Returns the string "Exercise Log"
-        return "Exercise Log"
+        CURSOR.execute(sql, (user.id if user else None, exercise.id if exercise else None, date, entry_id))
+        CONN.commit()
+
+    @classmethod
+    def delete_log_entry(cls, entry_id):
+        sql = """
+            DELETE FROM logs
+            WHERE id = ?
+        """
+
+        CURSOR.execute(sql, (entry_id,))
+        CONN.commit()
+
+    def __str__(self):
+        return f"Log with {len(self.entries)} entries"
+
+    @classmethod
+    def create_table(cls):
+        sql = """
+            CREATE TABLE IF NOT EXISTS logs (
+                id INTEGER PRIMARY KEY,
+                user_id TEXT,
+                exercise_id TEXT,
+                date INT
+            )
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
+
+    @classmethod
+    def drop_table(cls):
+        sql = """
+            DROP TABLE IF EXISTS logs;
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
