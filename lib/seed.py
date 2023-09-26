@@ -2,20 +2,20 @@
 
 from models.__init__ import CONN, CURSOR
 from models.exercise import Exercise
-from models.log import Log
-from models.user import User
+# from models.log import Log
+# from models.user import User
 
 def seed_database():
 
     # Delete existing tables
     Exercise.drop_table()
-    Log.drop_table()
-    User.drop_table()
+    # Log.drop_table()
+    # User.drop_table()
 
     # Create new tables
     Exercise.create_table()
-    Log.create_table()
-    User.create_table()
+    # Log.create_table()
+    # User.create_table()
 
     # Create seed data
     treadmill = Exercise.create("Treadmill", 15, "Cardio", "Advanced", 200)
