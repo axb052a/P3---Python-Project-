@@ -8,28 +8,22 @@ def helper_1():
 def create_exercise():
     name = input("Exercise: ")
     time = input("Duration (in minutes): ")
-    category = input("Category (Cardio or Strength): ")
-    intensity = input("Intensity (Beginner, Intermediate, Advanced): ")
+    category = input("Choose a category (Cardio = 1, Strength = 2): ")
+    intensity = input("Choose an intensity (Beginner = 1, Intermediate = 2, Advanced = 3): ")
     cals_burned = input("Calories Burned: ")
+
+    # Allow choices to be numbers
+    if category not in Exercise.CATEGORY and 0 < int(category) < len(Exercise.CATEGORY):
+        category = Exercise.CATEGORY[int(category) - 1]
+    if intensity not in Exercise.INTENSITY and 0 < int(intensity) < len(Exercise.INTENSITY):
+        intensity = Exercise.INTENSITY[int(intensity) -1]
+    
     try:
-        Exercise.create_table()
+        # Exercise.create_table()
         exercise = Exercise.create(name, time, category, intensity, cals_burned)
         print(f"Success: {exercise} is now available!")
     except Exception as exc:
         print("Error creating new exercise: ", exc)
-
-# def create_exercise():
-#     name = input("Exercise: ")
-#     time = input("Duration (in minutes): ")
-#     category = input("Category (Cardio or Strength): ")
-#     intensity = input("Intensity (Beginner, Intermediate, Advanced): ")
-#     cals_burned = input("Calories Burned: ")
-#     try:
-#         Exercise.create_table()
-#         exercise = Exercise.create(name, time, category, intensity, cals_burned)
-#         print(f"Success: {exercise} is now available!")
-#     except Exception as exc:
-#         print("Error creating new exercise: ", exc)
 
 def list_exercises():
     exercises = Exercise.get_all()
@@ -38,5 +32,5 @@ def list_exercises():
 
 
 def exit_program():
-    print("Goodbye!")
+    print("See you next time for another workout!")
     exit()
