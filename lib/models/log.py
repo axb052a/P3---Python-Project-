@@ -1,59 +1,160 @@
 from models.__init__ import CURSOR, CONN
-from user import User
-from exercise import Exercise 
-
-import datetime # Allows us to work with dates and times
+from models.user import User
+from models.exercise import Exercise
 
 class Log:
-    def __init__(self): 
-        self.entries = [] # An empty list that will store the exercise log entries
 
-    def create_log_entry(self, user, exercise, date): # Creates a new log entry + checks the type of object
-        if not isinstance(user, User):
-            raise ValueError("Invalid user object provided.")
-        if not isinstance(exercise, Exercise):
-            raise ValueError("Invalid exercise object provided.")
-        if not isinstance(date, datetime.datetime):
-            raise ValueError("Invalid date object provided.")
+    all = {}
 
-        log_entry = {"user": user, "exercise": exercise, "date": date} # Creates a dict to contain the user, exercise and date
-        self.entries.append(log_entry) # Appends the dict to the "entries" list
+    def __init__(self, user, exercise, date, id=None):
+        self.id = id
+        self.user = user
+        self.exercise = exercise
+        self.date = date
 
-    def read_log_entries(self): # Returns the list of long entries 
-        return self.entries
+    def __repr__(self):
+        return f"{self.id}. User: {self.user.name}, Exercise: {self.exercise.name}, Date: {self.date}"
 
-    def find_entry_by_id(self, entry_id): # Returns a matching entry by its Id
-        for entry in self.entries:
-            if entry.get("id") == entry_id:
-                return entry
-        return None
+    @property
+    def user(self):
+        return self._user
 
-    def update_log_entry(self, index, user=None, exercise=None, date=None): # To update an entry 
-        if index < 0 or index >= len(self.entries):
-            raise IndexError("Index out of range.")
+    @user.setter
+    def user(self, user):
+        if isinstance(user, User):
+            self._user = user
+        else:
+            raise Exception("Invalid user")
 
-        log_entry = self.entries[index]
+    @property
+    def exercise(self):
+        return self._exercise
 
-        if user is not None:
-            if not isinstance(user, User):
-                raise ValueError("Invalid user object provided.")
-            log_entry["user"] = user
+    @exercise.setter
+    def exercise(self, exercise):
+        if isinstance(exercise, Exercise):
+            self._exercise = exercise
+        else:
+            raise Exception("Invalid exercise")
 
-        if exercise is not None:
-            if not isinstance(exercise, Exercise):
-                raise ValueError("Invalid exercise object provided.")
-            log_entry["exercise"] = exercise
+    @property
+    def date(self):
+        return self._date
 
-        if date is not None:
-            if not isinstance(date, datetime.datetime):
-                raise ValueError("Invalid date object provided.")
-            log_entry["date"] = date
+    @date.setter
+    def date(self, date):
+        # Assuming date is a valid datetime object or string representation of a date
+        self._date = date
 
-    def delete_log_entry(self, index): # Delete a log entry
-        if index < 0 or index >= len(self.entries):
-            raise IndexError("Index out of range.")
+    @classmethod
+    def create_table(cls):
+        """ Create a table to persist the attributes of Log instances """
+        sql = """
+            CREATE TABLE IF NOT EXISTS logs (
+            id INTEGER PRIMARY KEY,
+            user_id TEXT,
+            exercise_id TEXT,
+            date INT,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (exercise_id) REFERENCES exercises(id))        
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
 
-        del self.entries[index]
+    @classmethod
+    def drop_table(cls):
+        """ Drop the table that persists Log instances """
+        sql = """
+            DROP TABLE IF EXISTS logs;
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
+    
+    def save(self):
+        """ Insert a new row with the log details for the current Log instance
+         Update object id attribute using the primary key value of the new row.
+          Save the object in the local dictionary using the table row's PK as the dictionary key """
+        
+        sql = """
+            INSERT INTO logs (user_id, exercise_id, date)
+            VALUES (?, ?, ?)
+        """
 
-    def __str__(self): # Returns the string "Exercise Log"
-        return "Exercise Log"
+        CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date))
+        CONN.commit()
+
+        self.id = CURSOR.lastrowid
+        Log.all[self.id] = self
+    
+    @classmethod
+    def create(cls, user, exercise, date):
+        """ Initialize a new Log instance and save the object to the database """
+        log = cls(user, exercise, date)
+        log.save()
+        return log
+    
+    def update(self):
+        """ Update the table row corresponding to the current Log instance """
+        sql = """
+            UPDATE logs
+            SET user_id = ?, exercise_id = ?, date = ?
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date, self.id))
+        CONN.commit()
+    
+    def delete(self):
+        """ Delete the table row corresponding to the current Log instance, delete the dictionary entry, and reassign id attribute """
+        sql = """
+            DELETE FROM logs
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (self.id,))
+        CONN.commit()
+
+        # Delete the dictionary entry using id as the key
+        del Log.all[self.id]
+
+        # Set the id to None
+        self.id = None
+    
+    @classmethod
+    def instance_from_db(cls, row):
+        """ Return a Log object having the attribute values from the table row """
+
+        # Check the dictionary for an existing instance using the row's primary key
+        log = Log.all.get(row[0])
+        if log:
+            log.user = User.find_by_id(row[1])
+            log.exercise = Exercise.find_by_id(row[2])
+            log.date = row[3]
+        else:
+            user = User.find_by_id(row[1])
+            exercise = Exercise.find_by_id(row[2])
+            log = Log(user, exercise, row[3])
+            log.id = row[0]
+            Log.all[log.id] = log
+        return log
+
+    @classmethod
+    def get_all(cls):
+        """ Return a list containing a Log object per row in the table """
+        sql = """
+            SELECT *
+            FROM logs
+        """
+        rows = CURSOR.execute(sql).fetchall()
+
+        return [Log.instance_from_db(row) for row in rows]
+
+    @classmethod
+    def find_by_id(cls, id):
+        """ Return a Log object corresponding to the table row matching the specified primary key """
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE id = ?
+        """
+
+        row = CURSOR.execute(sql, (id, )).fetchone()
+        return Log.instance_from_db(row) if row else None
