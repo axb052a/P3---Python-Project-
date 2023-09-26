@@ -139,7 +139,7 @@ class Exercise:
             DELETE FROM exercises
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.id))
+        CURSOR.execute(sql, (self.id, ))
         CONN.commit()
 
         # Delete the dictionary entry using id as the key

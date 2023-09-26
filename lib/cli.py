@@ -1,7 +1,5 @@
 # lib/cli.py
 
-import time
-import sys
 from models.exercise import Exercise
 
 from helpers import (
@@ -30,7 +28,8 @@ def main():
                     print("Workout History")
                 if choice == "x":
                     main()
-                print("Invalid choice")
+                else:
+                    print("Invalid choice user_menu")
         elif choice == "2":
             print("New User")
         elif choice == "3":
@@ -46,7 +45,7 @@ def main():
                 if choice == "x":
                     main()
                 else:
-                    print("Invalid choice")
+                    print("Invalid choice exercise_menu")
         else:
             print("Invalid choice")
 
