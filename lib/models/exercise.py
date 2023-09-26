@@ -15,10 +15,9 @@ class Exercise:
         self.category = category
         self.intensity = intensity
         self.cals_burned = cals_burned
-        Exercise.all.append(self)
 
     def __repr__(self):
-        return f"{self.id}, {self.name}, {self.time}, {self.category}, {self.intensity}, {self.cals_burned}"
+        return f"{self.id}. {self.name}, {self.time} min, {self.category}, {self.intensity}, {self.cals_burned} cals"
 
     @property
     def name(self):
@@ -37,6 +36,7 @@ class Exercise:
 
     @time.setter
     def time(self, time):
+        time = int(time)
         if isinstance(time, int) and 0 < time:
             self._time = time
         else:
@@ -70,6 +70,7 @@ class Exercise:
 
     @cals_burned.setter
     def cals_burned(self, cals_burned):
+        cals_burned = int(cals_burned)
         if isinstance(cals_burned, int) and 0 < cals_burned:
             self._cals_burned = cals_burned
         else:
@@ -85,8 +86,7 @@ class Exercise:
             time INT,
             category TEXT,
             intensity TEXT,
-            cals_burned INT
-            )        
+            cals_burned INT)        
         """
         CURSOR.execute(sql)
         CONN.commit()
@@ -147,3 +147,69 @@ class Exercise:
 
         # Set the id to None
         self.id = None
+    
+    @classmethod
+    def instance_from_db(cls, row):
+        """ Return an Exercise object having the attribute values from the table row """
+
+        # Check the dictionary for an existing instance using the row's primary key
+        exercise = Exercise.all.get(row[0])
+        if exercise:
+            exercise.name = row[1]
+            exercise.time = row[2]
+            exercise.category = row[3]
+            exercise.intensity = row[4]
+            exercise.cals_burned = row[5]
+        else:
+            exercise = Exercise(row[1], row[2], row[3], row[4], row[5])
+            exercise.id = row[0]
+            Exercise.all[exercise.id] = exercise
+        return exercise
+
+    @classmethod
+    def get_all(cls):
+        """ Return a list containing an Exercise object per row in the table """
+        sql = """
+            SELECT *
+            FROM exercises
+        """
+        rows = CURSOR.execute(sql).fetchall()
+
+        return [Exercise.instance_from_db(row) for row in rows]
+
+    @classmethod
+    def find_by_id(cls, id):
+        """ Return an Exercise object corresponding to the table row matching the specified primary key """
+        sql = """
+            SELECT *
+            FROM exercises
+            WHERE id = ?
+        """
+
+        row = CURSOR.execute(sql, (id, )).fetchone()
+        return Exercise.instance_from_db(row) if row else None
+    
+    @classmethod
+    def find_by_name(cls, name):
+        """ Return an Exercise object corresponding to the table row matching the name """
+        sql = """
+            SELECT *
+            FROM exercises
+            WHERE name = ?
+        """
+
+        row = CURSOR.execute(sql, (name, )).fetchone()
+        return Exercise.instance_from_db(row) if row else None
+    
+    def users(self):
+        """ Return list of users associated with Exercise instance """
+        from models.log import Log
+        sql = """
+            SELECT *
+            FROM log
+            WHERE exercise_id = ?
+        """
+        CURSOR.execute(sql, (self.id, ),)
+
+        rows = CURSOR.fetchall()
+        return [Exercise.instance_from_db(row) for row in rows]
