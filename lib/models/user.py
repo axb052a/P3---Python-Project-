@@ -1,3 +1,73 @@
+import sqlite3
+
+# Establish a connection to the SQLite database (create if not exists)
+conn = sqlite3.connect('fitness_tracker.db')
+
+@classmethod
+def create_table(cls):
+    """ Create a new table to persist the attributes of User instances """
+    sql = """
+            CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            height_ft INTEGER,
+            height_inches INTEGER,
+            weight INTEGER,)
+    """
+    CURSOR.execute(sql)
+    CONN.commit()
+
+
+@classmethod
+def drop_table(cls):
+    """ DROP the table that persists User instances"""
+    sql = """
+        DROP TABLE IF EXISTS  users;
+    """
+    CURSOR.execute(sql)
+    CONN.commit()
+
+def save(self):
+    """ Insert a new row with the name and location values of the current User instance.
+    Update object id attribute using the primary key value of new row.
+    """
+    sql = """
+        INSERT INTO users (name, height_ft, height_inches, weight)
+        VALUES (?, ?, ?, ?)
+    """
+    CURSOR.execute(sql, (self.name, self.height_ft, self.height_inches, self.weight))
+    CONN.commit()
+    
+    self.id = CURSOR.lastrowid
+
+def create_user(cls, name, height_ft, height_inches, weight):
+    """ Initialize a new User instance and save the object to the database """
+    user = cls(name, height_ft, height_inches, weight)
+    user.save()
+    return user
+
+def update(self):
+        """Update the table row corresponding to the current User instance."""
+        sql = """
+            UPDATE user
+            SET name = ?, height_ft = ?, height_inches = ?, weight = ?
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (self.name, self.height_ft, self.height_inches, self.weight, self.id))
+        CONN.commit()
+
+def delete(self):
+        """Delete the table row corresponding to the current User instance"""
+        sql = """
+            DELETE FROM users
+            WHERE id = ?
+        """
+
+        CURSOR.execute(sql, (self.id,))
+        CONN.commit()
+
+
+
 class User:
     def __init__(self, name, height_ft, height_inches, weight):
         self.name = name
@@ -5,6 +75,15 @@ class User:
         self.height_inches = height_inches
         self.weight = weight
         self.workouts = []
+        
+
+
+def get_all_users(conn):
+    cursor = conn.execute('SELECT * FROM Users')
+    return cursor.fetchall()
+
+
+
 
 @property
 def name(self):
