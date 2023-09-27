@@ -9,50 +9,170 @@ def helper_1():
 def create_exercise():
     name = input("Exercise: ")
     time = input("Duration (in minutes): ")
-    category = input("Category (Cardio or Strength): ")
-    intensity = input("Intensity (Beginner, Intermediate, Advanced): ")
+    category = input("Choose a category (Cardio = 1, Strength = 2): ")
+    intensity = input("Choose an intensity (Beginner = 1, Intermediate = 2, Advanced = 3): ")
     cals_burned = input("Calories Burned: ")
+
+    # Allow choices to be numbers
+    if category not in Exercise.CATEGORY and 0 < int(category) < len(Exercise.CATEGORY):
+        category = Exercise.CATEGORY[int(category) - 1]
+    if intensity not in Exercise.INTENSITY and 0 < int(intensity) < len(Exercise.INTENSITY):
+        intensity = Exercise.INTENSITY[int(intensity) -1]
+    
     try:
-        Exercise.create_table()
+        # Exercise.create_table()
         exercise = Exercise.create(name, time, category, intensity, cals_burned)
-        print(f"Success: {exercise} is now available!")
+        print(f"Success: {exercise.name} is now available!")
     except Exception as exc:
         print("Error creating new exercise: ", exc)
-
-# def create_exercise():
-#     name = input("Exercise: ")
-#     time = input("Duration (in minutes): ")
-#     category = input("Category (Cardio or Strength): ")
-#     intensity = input("Intensity (Beginner, Intermediate, Advanced): ")
-#     cals_burned = input("Calories Burned: ")
-#     try:
-#         Exercise.create_table()
-#         exercise = Exercise.create(name, time, category, intensity, cals_burned)
-#         print(f"Success: {exercise} is now available!")
-#     except Exception as exc:
-#         print("Error creating new exercise: ", exc)
 
 def list_exercises():
     exercises = Exercise.get_all()
     for exercise in exercises:
         print(exercise)
 
-def create_logs():
-    name = input("Enter your name: ")
-    exercise = input("Enter the exercise: ")
-    date = input("Enter a date: ")
+def get_exercise_by_name_or_id():
+    name = input("Exercise or ID: ")
     try:
-        Log.create_table()
-        log = Log.create(name=name, exercise=exercise, date=date)
-        print(f'Success: {log} is now logged!')
-    except Exception as exc:
-        print("Error creating new log: ", exc)
+        id_ = int(name)
+        exercise = Exercise.find_by_id(id_)
+        print(exercise) if exercise else print(f"Exercise {name} not found")
+    except:
+        exercise = Exercise.find_by_name(name.title()) # .title() to allow for case insensitive
+        print(exercise) if exercise else print(f"Exercise {name} not found")
+
+def update_exercise_by_name_or_id():
+    name = input("Exercise or ID: ")
+    try:
+        id_ = int(name)
+        exercise = Exercise.find_by_id(id_)
+        collect_updates(exercise)
+    except:
+        try:
+            exercise = Exercise.find_by_name(name.title())
+            collect_updates(exercise)
+        except Exception as exc:
+            print("Error updating exercise", exc)
+
+def collect_updates(exercise):
+        # Update exercise instance
+        name = input(f"{exercise.name} new name: ")
+        exercise.name = name
+        time = input(f"{exercise.name} new time: ")
+        exercise.time = time
+        category = input(f"{exercise.name} new category (Cardio = 1, Strength = 2): ")
+        # exercise.category = category
+        intensity = input(f"{exercise.name} new intensity (Beginner = 1, Intermediate = 2, Advanced = 3): ")
+        # exercise.intensity = intensity
+        cals_burned = input(f"{exercise.name} new calories burned: ")
+        exercise.cals_burned = cals_burned
+
+        # Allow choices to be numbers
+        if category not in Exercise.CATEGORY and 0 < int(category) < len(Exercise.CATEGORY):
+            exercise.category = Exercise.CATEGORY[int(category) - 1]
+        if intensity not in Exercise.INTENSITY and 0 < int(intensity) < len(Exercise.INTENSITY):
+            exercise.intensity = Exercise.INTENSITY[int(intensity) -1]        
+
+        """ Exercise instance updated in database with .update() """
+        exercise.update()
+        print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
+
+def delete_exercise_by_name_or_id():
+    name_or_id = input("Exercise or ID: ")
+    deleted_exercise = "deleted exercise"
+
+    try:
+        id_ = int(name_or_id)
+        exercise = Exercise.find_by_id(id_)
+        Exercise.delete(exercise)
+        print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
+    except:
+        try:
+            exercise = Exercise.find_by_name(name_or_id.title())
+            Exercise.delete(exercise)
+            print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
+        except Exception as exc:
+            print("Error deleting exercise")
+            
+def find_most_and_least_popular_exercises():
+    # Get a list of all exercises
+    all_exercises = Exercise.get_all()
+
+    # Initialize dictionaries to store exercise popularity counts
+    exercise_popularity = {}
+    
+    # Count the popularity of each exercise based on log entries
+    for exercise in all_exercises:
+        log_entries = Log.find_by_exercise(exercise)
+        exercise_popularity[exercise.name] = len(log_entries)
+
+    # Find the most and least popular exercises
+    most_popular_exercise = max(exercise_popularity, key=exercise_popularity.get)
+    least_popular_exercise = min(exercise_popularity, key=exercise_popularity.get)
+
+    print(f"The most popular exercise is: {most_popular_exercise} with {exercise_popularity[most_popular_exercise]} log entries.")
+    print(f"The least popular exercise is: {least_popular_exercise} with {exercise_popularity[least_popular_exercise]} log entries.")
+
+def create_log():
+    try:
+        exercise_name_or_id = input("Enter the exercise name or ID: ")
+        date = input("Enter the date (YYYY-MM-DD): ")
+        
+        # Assuming you have a valid user_id, replace 'your_user_id' with the actual user ID
+        user_id = 'your_user_id'
+        
+        # Try to convert exercise_name_or_id to an integer (exercise ID)
+        try:
+            exercise_id = int(exercise_name_or_id)
+        except ValueError:
+            # If it's not an integer, assume it's the exercise name and try to find the exercise
+            exercise = Exercise.find_by_name(exercise_name_or_id)
+            if exercise:
+                exercise_id = exercise.exercise_id
+            else:
+                print("Exercise not found.")
+                return  # Exit the function if exercise is not found
+        
+        log = Log.create(exercise_id, user_id, date)
+        print("Log created successfully.")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 def list_logs():
     logs = Log.get_all()
     for log in logs:
         print(log)
-        
+
+def get_log_by_id(log_id):
+    try:
+        log = Log.find_by_id(log_id)
+        if log:
+            print("Log found:")
+            print(f"ID: {log.log_id}")
+            print(f"Date: {log.date}")
+        else:
+            print("Log not found.")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
+def update_log_by_id(log_id):
+    log = Log.find_by_id(log_id)
+    if log:
+        date = input("New Date (YYYY-MM-DD): ")
+        log.date = date
+        log.update()
+        print(f"Log entry for {log.exercise.name} updated to {log.date}.")
+    else:
+        print(f"Log entry with ID {log_id} not found.")
+
+def delete_log_by_id(log_id):
+    log = Log.find_by_id(log_id)
+    if log:
+        Log.delete(log)
+        print(f"Log entry for {log.exercise.name} on {log.date} deleted.")
+    else:
+        print(f"Log entry with ID {log_id} not found.")
+
 def exit_program():
-    print("Goodbye!")
+    print("See you next time for another workout!")
     exit()
