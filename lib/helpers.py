@@ -112,66 +112,66 @@ def find_most_and_least_popular_exercises():
 
     print(f"The most popular exercise is: {most_popular_exercise} with {exercise_popularity[most_popular_exercise]} log entries.")
     print(f"The least popular exercise is: {least_popular_exercise} with {exercise_popularity[least_popular_exercise]} log entries.")
-
+    
 def create_log():
     try:
-        exercise_name_or_id = input("Enter the exercise name or ID: ")
-        date = input("Enter the date (YYYY-MM-DD): ")
-        
-        # Assuming you have a valid user_id, replace 'your_user_id' with the actual user ID
-        user_id = 'your_user_id'
-        
-        # Try to convert exercise_name_or_id to an integer (exercise ID)
-        try:
-            exercise_id = int(exercise_name_or_id)
-        except ValueError:
-            # If it's not an integer, assume it's the exercise name and try to find the exercise
-            exercise = Exercise.find_by_name(exercise_name_or_id)
-            if exercise:
-                exercise_id = exercise.exercise_id
-            else:
-                print("Exercise not found.")
-                return  # Exit the function if exercise is not found
-        
-        log = Log.create(exercise_id, user_id, date)
+        user = input("User ID: ")
+        exercise = input("Exercise ID: ")
+        date = input("Date (YYYY-MM-DD): ")
+
+        log = Log.create(user, exercise, date)
         print("Log created successfully.")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+    except Exception as exc:
+        print("Error creating new log: ", exc)
 
 def list_logs():
     logs = Log.get_all()
     for log in logs:
         print(log)
 
-def get_log_by_id(log_id):
+def get_log_by_id():
+    log_id = input("Log ID: ")
     try:
-        log = Log.find_by_id(log_id)
-        if log:
-            print("Log found:")
-            print(f"ID: {log.log_id}")
-            print(f"Date: {log.date}")
-        else:
-            print("Log not found.")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        id_ = int(log_id)
+        log = Log.find_by_id(id_)
+        print(log) if log else print(f"Log with ID {log_id} not found")
+    except:
+        print(f"Invalid Log ID: {log_id}")
 
-def update_log_by_id(log_id):
-    log = Log.find_by_id(log_id)
-    if log:
-        date = input("New Date (YYYY-MM-DD): ")
+def update_log_by_id():
+    log_id = input("Log ID: ")
+    try:
+        id_ = int(log_id)
+        log = Log.find_by_id(id_)
+        if log:
+            collect_log_updates(log)
+        else:
+            print(f"Log with ID {log_id} not found")
+    except:
+        print(f"Invalid Log ID: {log_id}")
+
+def collect_log_updates(log):
+    try:
+        date = input(f"New date for Log ID {log.id} (YYYY-MM-DD): ")
         log.date = date
         log.update()
-        print(f"Log entry for {log.exercise.name} updated to {log.date}.")
-    else:
-        print(f"Log entry with ID {log_id} not found.")
+        print(f"Log entry updated successfully for Log ID {log.id}.")
+    except Exception as exc:
+        print(f"Error updating log entry: {exc}")
 
-def delete_log_by_id(log_id):
-    log = Log.find_by_id(log_id)
-    if log:
-        Log.delete(log)
-        print(f"Log entry for {log.exercise.name} on {log.date} deleted.")
-    else:
-        print(f"Log entry with ID {log_id} not found.")
+def delete_log_by_id():
+    log_id = input("Log ID: ")
+    try:
+        id_ = int(log_id)
+        log = Log.find_by_id(id_)
+        if log:
+            Log.delete(log)
+            print(f"Log entry with ID {log.id} deleted successfully.")
+        else:
+            print(f"Log with ID {log_id} not found")
+    except:
+        print(f"Invalid Log ID: {log_id}")
+
 
 def exit_program():
     print("See you next time for another workout!")
