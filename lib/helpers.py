@@ -54,6 +54,7 @@ def update_exercise_by_name_or_id():
             print("Error updating exercise")
 
 def collect_updates(exercise):
+        # Update exercise instance
         name = input(f"{exercise.name} new name: ")
         exercise.name = name
         time = input(f"{exercise.name} new time: ")
@@ -71,9 +72,9 @@ def collect_updates(exercise):
         if intensity not in Exercise.INTENSITY and 0 < int(intensity) < len(Exercise.INTENSITY):
             exercise.intensity = Exercise.INTENSITY[int(intensity) -1]        
 
+        """ Exercise instance updated in database with .update() """
         exercise.update()
         print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
-
 
 def delete_exercise_by_name_or_id():
     name_or_id = input("Exercise or ID: ")

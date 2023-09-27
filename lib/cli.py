@@ -82,6 +82,15 @@ def exercise_menu():
     print("[6] Create Exercise")
     print("[x] Return to Home")
 
+def exercise_search_menu():
+    print("Please select an option:")
+    print("[1] ID")
+    print("[2] Name")
+    print("[3] Time")
+    print("[4] Category")
+    print("[5] Intensity")
+    print("[6] Calories Burned")
+    print("[x] Return to Exercise Menu")
 
 if __name__ == "__main__":
     print("Welcome to PyFit! Track your fitness journey to help you reach your goals.")
