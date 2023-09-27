@@ -6,43 +6,52 @@ from helpers import (
     exit_program,
     helper_1,
     create_exercise,
-    list_exercises
+    list_exercises,
+    get_exercise_by_name_or_id,
+    update_exercise_by_name_or_id,
+    delete_exercise_by_name_or_id
 )
 
 
 def main():
+    home_menu()
     while True:
-        home_menu()
         choice = input("> ")
         if choice == "x":
             exit_program()
         elif choice == "1":
+            user_menu()
             while True:
-                user_menu()
                 choice = input("> ")
                 if choice == "1":
                     print("My Info")
-                if choice == "2":
+                elif choice == "2":
                     print("My Stats")
-                if choice == "3":
+                elif choice == "3":
                     print("Workout History")
-                if choice == "x":
+                elif choice == "x":
                     main()
                 else:
                     print("Invalid choice user_menu")
         elif choice == "2":
             print("New User")
         elif choice == "3":
+            exercise_menu()
             while True:
-                exercise_menu()
                 choice = input("> ")
                 if choice == "1":
                     list_exercises()
-                if choice == "2":
+                elif choice == "2":
                     print("Exercise Stats")
-                if choice == "3":
+                elif choice == "3":
+                    get_exercise_by_name_or_id()
+                elif choice == "4":
+                    update_exercise_by_name_or_id()                    
+                elif choice == "5":
+                    delete_exercise_by_name_or_id()
+                elif choice == "6":
                     create_exercise()
-                if choice == "x":
+                elif choice == "x":
                     main()
                 else:
                     print("Invalid choice exercise_menu")
@@ -67,7 +76,10 @@ def exercise_menu():
     print("Please select an option:")
     print("[1] Exercises")
     print("[2] Exercise Stats")
-    print("[3] Create Exercise")
+    print("[3] Search for Exercise")
+    print("[4] Update Exercise")  
+    print("[5] Delete Exercise")      
+    print("[6] Create Exercise")
     print("[x] Return to Home")
 
 
