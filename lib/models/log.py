@@ -2,8 +2,13 @@ from models.__init__ import CURSOR, CONN
 from models.user import User
 from models.exercise import Exercise
 
-class Log:
+import sqlite3
+import datetime
 
+# Establish a connection to the SQLite database (create if not exists)
+# conn = sqlite3.connect('fitness_tracker.db')
+
+class Log:
     all = {}
 
     def __init__(self, user, exercise, date, id=None):
@@ -43,8 +48,16 @@ class Log:
 
     @date.setter
     def date(self, date):
-        # Assuming date is a valid datetime object or string representation of a date
-        self._date = date
+        if isinstance(date, str):
+            # Parse the date string to a datetime object
+            try:
+                self._date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            except ValueError:
+                raise ValueError("Invalid date format. Use YYYY-MM-DD.")
+        elif isinstance(date, datetime.date):
+            self._date = date
+        else:
+            raise ValueError("Invalid date type.")
 
     @classmethod
     def create_table(cls):
@@ -88,21 +101,20 @@ class Log:
     
     @classmethod
     def create(cls, user, exercise, date):
-        """ Initialize a new Log instance and save the object to the database """
         log = cls(user, exercise, date)
         log.save()
         return log
-    
+
     def update(self):
         """ Update the table row corresponding to the current Log instance """
         sql = """
             UPDATE logs
-            SET user_id = ?, exercise_id = ?, date = ?
+            SET user_id = ?, exercise_id = ?, date = ?, duration = ?
             WHERE id = ?
         """
         CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date, self.id))
         CONN.commit()
-    
+
     def delete(self):
         """ Delete the table row corresponding to the current Log instance, delete the dictionary entry, and reassign id attribute """
         sql = """
@@ -117,7 +129,7 @@ class Log:
 
         # Set the id to None
         self.id = None
-    
+
     @classmethod
     def instance_from_db(cls, row):
         """ Return a Log object having the attribute values from the table row """
@@ -131,7 +143,7 @@ class Log:
         else:
             user = User.find_by_id(row[1])
             exercise = Exercise.find_by_id(row[2])
-            log = Log(user, exercise, row[3])
+            log = Log(user, exercise, row[3], row[4])
             log.id = row[0]
             Log.all[log.id] = log
         return log
@@ -156,5 +168,28 @@ class Log:
             WHERE id = ?
         """
 
-        row = CURSOR.execute(sql, (id, )).fetchone()
+        row = CURSOR.execute(sql, (id,)).fetchone()
         return Log.instance_from_db(row) if row else None
+
+    @classmethod
+    def find_by_user(cls, user):
+        """ Return a list of Log objects corresponding to the logs of the specified user """
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE user_id = ?
+        """
+
+        rows = CURSOR.execute(sql, (user.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]  # Return a list of logs for the user
+    
+    @classmethod
+    def find_by_exercise(cls, exercise):
+        """ Return a list of log entries for a specific exercise """
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE exercise_id = ?
+        """
+        rows = CURSOR.execute(sql, (exercise.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]
