@@ -213,3 +213,4 @@ class Exercise:
 
         rows = CURSOR.fetchall()
         return [Exercise.instance_from_db(row) for row in rows]
+    

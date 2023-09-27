@@ -58,6 +58,14 @@ class Log:
             FOREIGN KEY (user_id) REFERENCES users(id),
             FOREIGN KEY (exercise_id) REFERENCES exercises(id))        
         """
+        # sql = """
+        #     CREATE TABLE IF NOT EXISTS logs (
+        #     id INTEGER PRIMARY KEY,
+        #     user TEXT,
+        #     exercise TEXT,
+        #     date INT
+        #     )     
+        # """
         CURSOR.execute(sql)
         CONN.commit()
 
@@ -82,6 +90,14 @@ class Log:
 
         CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date))
         CONN.commit()
+
+        # sql = """
+        #     INSERT INTO logs (user, exercise, date)
+        #     VALUES (?, ?, ?)
+        # """
+
+        # CURSOR.execute(sql, (self.user.name, self.exercise.name, self.date))
+        # CONN.commit()
 
         self.id = CURSOR.lastrowid
         Log.all[self.id] = self
