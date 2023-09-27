@@ -1,7 +1,9 @@
 import sqlite3
 
+from models.__init__ import CURSOR, CONN
+
 # Establish a connection to the SQLite database (create if not exists)
-conn = sqlite3.connect('fitness_tracker.db')
+# conn = sqlite3.connect('fitness_tracker.db')
 
 @classmethod
 def create_table(cls):
