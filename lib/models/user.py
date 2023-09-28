@@ -7,17 +7,33 @@ from models.__init__ import CURSOR, CONN
 
 class User:
 
+    all = {}
+
     def __init__(self, name, height_ft, height_inches, weight, id=None):
         self.id = id
         self.name = name
         self.height_ft = height_ft
         self.height_inches = height_inches
         self.weight = weight
-        self.workouts = []     
+        self.workouts = []
+    
+    def __repr__(self):
+        return f"{self.id} | {self.name} | {self.height_ft}\'{self.height_inches}\" | {self.weight}"
 
-    def get_all_users(conn):
-        cursor = conn.execute('SELECT * FROM Users')
-        return cursor.fetchall()
+    # def get_all_users(conn):
+    #     cursor = conn.execute('SELECT * FROM Users')
+    #     return cursor.fetchall()
+
+    @classmethod
+    def get_all(cls):
+        """ Return a list containing User object per row in the table """
+        sql = """
+            SELECT *
+            FROM users
+        """
+        rows = CURSOR.execute(sql).fetchall()
+
+        return [User.instance_from_db(row) for row in rows]
 
     @property
     def name(self):
@@ -109,6 +125,7 @@ class User:
         CONN.commit()
         
         self.id = CURSOR.lastrowid
+        User.all[self.id] = self
 
     @classmethod
     def create_user(cls, name, height_ft, height_inches, weight):
@@ -137,5 +154,58 @@ class User:
             CURSOR.execute(sql, (self.id,))
             CONN.commit()
 
+            del User.all[self.id]
 
+            self.id = None
 
+    @classmethod
+    def instance_from_db(cls, row):
+        """ Return User object having the attribute values from the table row """
+
+        # Check the dictionary for an existing instance using the row's primary key
+        user = User.all.get(row[0])
+        if user:
+            user.name = row[1]
+            user.height_ft = row[2]
+            user.height_inches = row[3]
+            user.weight = row[4]
+        else:
+            user = User(row[1], row[2], row[3], row[4])
+            user.id = row[0]
+            User.all[user.id] = user
+        return user
+    
+    @classmethod
+    def find_by_id(cls, id):
+        """ Return User object corresponding to the table row matching the specified primary key """
+        sql = """
+            SELECT *
+            FROM users
+            WHERE id = ?
+        """
+
+        row = CURSOR.execute(sql, (id, )).fetchone()
+        return User.instance_from_db(row) if row else None
+    
+    @classmethod
+    def get_all(cls):
+        """ Return a list containing an Exercise object per row in the table """
+        sql = """
+            SELECT *
+            FROM users
+        """
+        rows = CURSOR.execute(sql).fetchall()
+
+        return [User.instance_from_db(row) for row in rows]
+    
+    @classmethod
+    def find_by_name(cls, name):
+        """ Return an Exercise object corresponding to the table row matching the name """
+        sql = """
+            SELECT *
+            FROM users
+            WHERE name = ?
+        """
+
+        row = CURSOR.execute(sql, (name, )).fetchone()
+        return User.instance_from_db(row) if row else None

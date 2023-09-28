@@ -2,46 +2,86 @@
 
 from models.exercise import Exercise
 from models.log import Log
+from models.user import User
 
-def helper_1():
-    print("Performing useful function#1.")
+from rich import print
+from rich.console import Console
+from rich.table import Table
+
+logged_in_user_id = [0]
+open = "\033[34m"
+close = "\33[0m"
 
 def create_exercise():
-    name = input("Exercise: ")
+#  category not in Exercise.CATEGORY 
+#  intensity not in Exercise.INTENSITY and 
+    print("Create Exercise")
+    name = input(f"{open} Enter Exercise: {close}")
+    while not isinstance(name, str) or len(name) >= 20:
+        print("Name must be greater than 0 and less than or equal to 20 characters.")
+        name = input("Exercise: ")
     time = input("Duration (in minutes): ")
-    category = input("Choose a category (Cardio = 1, Strength = 2): ")
-    intensity = input("Choose an intensity (Beginner = 1, Intermediate = 2, Advanced = 3): ")
+    try:
+        time = int(time)
+    except:
+        print("Duration must be a number")
+        time = input("Duration (in minutes): ")
+    category = input("Choose a category [1] Cardio, [2] Strength: ")
+    try:
+        if int(category) not in range(1, len(Exercise.CATEGORY)+1):
+            print("Enter a number the represents the exercise category")
+            category = input("Choose a category [1] Cardio, [2] Strength: ")
+    except ValueError:
+        print("Enter a number the represents the exercise category")
+        category = input("Choose a category [1] Cardio, [2] Strength: ")
+    intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
+    while int(intensity) not in range(1, len(Exercise.INTENSITY)+1):
+        print("Enter a number that represents the exercise intensity")
+        intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
     cals_burned = input("Calories Burned: ")
+    try:
+        cals_burned = int(cals_burned)
+    except:
+        print("Enter a number for calories burned")
+        cals_burned = input("Calories Burned: ")
 
     # Allow choices to be numbers
-    if category not in Exercise.CATEGORY and 0 < int(category) < len(Exercise.CATEGORY):
+    if category not in Exercise.CATEGORY and 0 < int(category) <=len(Exercise.CATEGORY):
         category = Exercise.CATEGORY[int(category) - 1]
-    if intensity not in Exercise.INTENSITY and 0 < int(intensity) < len(Exercise.INTENSITY):
+    if intensity not in Exercise.INTENSITY and 0 < int(intensity) <= len(Exercise.INTENSITY):
         intensity = Exercise.INTENSITY[int(intensity) -1]
-    
+
     try:
-        # Exercise.create_table()
         exercise = Exercise.create(name, time, category, intensity, cals_burned)
-        print(f"Success: {exercise.name} is now available!")
+        print(f"Success: {exercise.name} is now available! 🏃🏻‍♂️")
     except Exception as exc:
         print("Error creating new exercise: ", exc)
 
+
 def list_exercises():
+    print("Exercises")
+    print("ID | Exercise | Duration | Category | Intensity | Calories Burned")
     exercises = Exercise.get_all()
     for exercise in exercises:
         print(exercise)
 
+    exercise_names = []
+    for exercise in exercises:
+        exercise_names.append(exercise.name)
+
 def get_exercise_by_name_or_id():
+    print("Search for Exercise")
     name = input("Exercise or ID: ")
     try:
         id_ = int(name)
         exercise = Exercise.find_by_id(id_)
-        print(exercise) if exercise else print(f"Exercise {name} not found")
+        print(f"ID | Exercise | Duration | Category | Intensity | Calories Burned\n{exercise}") if exercise else print(f"Exercise {name} not found")
     except:
         exercise = Exercise.find_by_name(name.title()) # .title() to allow for case insensitive
-        print(exercise) if exercise else print(f"Exercise {name} not found")
+        print(f"ID | Exercise | Duration | Category | Intensity | Calories Burned\n{exercise}") if exercise else print(f"Exercise {name} not found")
 
 def update_exercise_by_name_or_id():
+    print("Update Exercise")
     name = input("Exercise or ID: ")
     try:
         id_ = int(name)
@@ -68,9 +108,9 @@ def collect_updates(exercise):
         exercise.cals_burned = cals_burned
 
         # Allow choices to be numbers
-        if category not in Exercise.CATEGORY and 0 < int(category) < len(Exercise.CATEGORY):
+        if category not in Exercise.CATEGORY and 0 < int(category) <= len(Exercise.CATEGORY):
             exercise.category = Exercise.CATEGORY[int(category) - 1]
-        if intensity not in Exercise.INTENSITY and 0 < int(intensity) < len(Exercise.INTENSITY):
+        if intensity not in Exercise.INTENSITY and 0 < int(intensity) <= len(Exercise.INTENSITY):
             exercise.intensity = Exercise.INTENSITY[int(intensity) -1]        
 
         """ Exercise instance updated in database with .update() """
@@ -78,6 +118,7 @@ def collect_updates(exercise):
         print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
 
 def delete_exercise_by_name_or_id():
+    print("Delete Exercise")
     name_or_id = input("Exercise or ID: ")
     deleted_exercise = "deleted exercise"
 
@@ -103,7 +144,7 @@ def find_most_and_least_popular_exercises():
     
     # Count the popularity of each exercise based on log entries
     for exercise in all_exercises:
-        log_entries = Log.find_by_exercise(exercise)
+        log_entries = Log.find_by_id(exercise)
         exercise_popularity[exercise.name] = len(log_entries)
 
     # Find the most and least popular exercises
@@ -114,31 +155,40 @@ def find_most_and_least_popular_exercises():
     print(f"The least popular exercise is: {least_popular_exercise} with {exercise_popularity[least_popular_exercise]} log entries.")
     
 def create_log():
+    print("New Workout Entry")
     try:
-        user = input("User ID: ")
-        exercise = input("Exercise ID: ")
+        user_id = input("User ID: ")
+        exercise_id = input("Exercise ID: ")
         date = input("Date (YYYY-MM-DD): ")
 
-        log = Log.create(user, exercise, date)
+        user_instance = User.find_by_id(user_id)
+        exercise_instance = Exercise.find_by_id(exercise_id)
+
+        log = Log.create(user_instance, exercise_instance, date)
         print("Log created successfully.")
+
     except Exception as exc:
         print("Error creating new log: ", exc)
 
 def list_logs():
-    logs = Log.get_all()
-    for log in logs:
-        print(log)
+    print("Logs")
+    # logs = Log.get_all()
+    # for log in logs:
+    #     print(log)
+    Log.get_all()
 
 def get_log_by_id():
+    print("Get Log by ID")
     log_id = input("Log ID: ")
     try:
         id_ = int(log_id)
         log = Log.find_by_id(id_)
-        print(log) if log else print(f"Log with ID {log_id} not found")
+        print(f"Date | User | Exercise\n{log.date} | {log.user.name} | {log.exercise.name}") if log else print(f"Log with ID {log_id} not found")
     except:
         print(f"Invalid Log ID: {log_id}")
 
 def update_log_by_id():
+    print("Update Log Date by ID")
     log_id = input("Log ID: ")
     try:
         id_ = int(log_id)
@@ -160,13 +210,14 @@ def collect_log_updates(log):
         print(f"Error updating log entry: {exc}")
 
 def delete_log_by_id():
+    print("Delete Log by ID")
     log_id = input("Log ID: ")
     try:
         id_ = int(log_id)
         log = Log.find_by_id(id_)
         if log:
             Log.delete(log)
-            print(f"Log entry with ID {log.id} deleted successfully.")
+            print(f"Log entry with ID {log_id} deleted successfully.")
         else:
             print(f"Log with ID {log_id} not found")
     except:
@@ -176,3 +227,77 @@ def delete_log_by_id():
 def exit_program():
     print("See you next time for another workout!")
     exit()
+
+def show_popular():
+    Exercise.most_popular()
+
+def least_popular():
+    Exercise.least_popular()
+
+def list_users():
+    print("Users")
+    print("ID | User | Height | Weight (lbs)")
+    users = User.get_all()
+    for user in users:
+        print(user)
+
+def create_user():
+    print("Register new user")
+    name = input("Name: ")
+    
+    try:
+        search_for_user = User.find_by_name(name)
+        if search_for_user.name == name:
+            print(f"Error creating new user. User already exists.\nWelcome back, {search_for_user.name}!")
+            logged_in_user_id[0] = search_for_user.id
+
+    except:
+        height = input("Height (inches): ")
+        weight = input("Weight (lbs): ")
+        # Convert height to feet and inches
+        height = int(height)
+        height_ft = round(height/12)
+        height_inches = height - height_ft * 12
+
+        weight = int(weight)
+
+        try:
+            
+            user = User.create_user(name, height_ft, height_inches, weight)
+            print(f"Welcome to PyFit, {user.name}!")
+            logged_in_user_id[0] = user.id
+        except Exception as exc:
+            print("Error creating new user: ", exc)
+
+def login_user():
+    print("Login User")
+    user_status = input("New User? [y/n] ")
+    if user_status == "y":
+        create_user()
+    elif user_status == "n":
+        name = input("Name: ")
+        try:
+            user = User.find_by_name(name)
+            logged_in_user_id[0] = user.id
+            print(f"Welcome back, {user.name}!")
+        except:
+            raise Exception("Unable to find user. Please try again.")
+    else:
+        print("Invalid menu selection")
+
+def get_user_logs():
+    print("Get User Logs")
+    name = input("Name: ")
+    try:
+        log = Log.find_by_name(name)
+        print(f"Date | User | Exercise\n{log.date} | {log.user.name} | {log.exercise.name}") if log else print(f"Logs for {name} not found")
+    except:
+        print(f"Invalid name")
+
+def get_my_info():
+    print("My Info")
+    my_info = User.find_by_id(logged_in_user_id[0])
+    print("ID | User | Height | Weight (lbs)")
+    print(my_info)
+
+    

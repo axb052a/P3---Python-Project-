@@ -13,7 +13,7 @@ class Log:
         self.date = date
 
     def __repr__(self):
-        return f"{self.id}. User: {self.user.name}, Exercise: {self.exercise.name}, Date: {self.date}"
+        return f"{self.id} | User: {self.user.name} | Exercise: {self.exercise.name} | Date: {self.date}"
 
     @property
     def user(self):
@@ -49,23 +49,26 @@ class Log:
     @classmethod
     def create_table(cls):
         """ Create a table to persist the attributes of Log instances """
+        # sql = """
+        #     CREATE TABLE IF NOT EXISTS logs (
+        #     id INTEGER PRIMARY KEY,
+        #     user_id TEXT,
+        #     exercise_id TEXT,
+        #     date INT,
+        #     FOREIGN KEY (user_id) REFERENCES users(id),
+        #     FOREIGN KEY (exercise_id) REFERENCES exercises(id))        
+        # """
+
         sql = """
             CREATE TABLE IF NOT EXISTS logs (
             id INTEGER PRIMARY KEY,
             user_id TEXT,
+            user TEXT,
             exercise_id TEXT,
-            date INT,
-            FOREIGN KEY (user_id) REFERENCES users(id),
-            FOREIGN KEY (exercise_id) REFERENCES exercises(id))        
+            exercise TEXT,
+            date INT
+            )     
         """
-        # sql = """
-        #     CREATE TABLE IF NOT EXISTS logs (
-        #     id INTEGER PRIMARY KEY,
-        #     user TEXT,
-        #     exercise TEXT,
-        #     date INT
-        #     )     
-        # """
         CURSOR.execute(sql)
         CONN.commit()
 
@@ -83,21 +86,21 @@ class Log:
          Update object id attribute using the primary key value of the new row.
           Save the object in the local dictionary using the table row's PK as the dictionary key """
         
-        sql = """
-            INSERT INTO logs (user_id, exercise_id, date)
-            VALUES (?, ?, ?)
-        """
-
-        CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date))
-        CONN.commit()
-
         # sql = """
-        #     INSERT INTO logs (user, exercise, date)
+        #     INSERT INTO logs (user_id, exercise_id, date)
         #     VALUES (?, ?, ?)
         # """
 
-        # CURSOR.execute(sql, (self.user.name, self.exercise.name, self.date))
+        # CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date))
         # CONN.commit()
+
+        sql = """
+            INSERT INTO logs (user_id, user, exercise_id, exercise, date)
+            VALUES (?, ?, ?, ?, ?)
+        """
+
+        CURSOR.execute(sql, (self.user.id, self.user.name, self.exercise.id, self.exercise.name, self.date))
+        CONN.commit()
 
         self.id = CURSOR.lastrowid
         Log.all[self.id] = self
@@ -139,18 +142,33 @@ class Log:
         """ Return a Log object having the attribute values from the table row """
 
         # Check the dictionary for an existing instance using the row's primary key
+        # log = Log.all.get(row[0])
+        # if log:
+        #     log.user = User.find_by_id(row[1])
+        #     log.exercise = Exercise.find_by_id(row[2])
+        #     log.date = row[3]
+        # else:
+        #     user = User.find_by_id(row[1])
+        #     exercise = Exercise.find_by_id(row[2])
+        #     log = Log(user, exercise, row[3])
+        #     log.id = row[0]
+        #     Log.all[log.id] = log
+        # return log
+
+        # Updated to reference additional table columns
         log = Log.all.get(row[0])
         if log:
             log.user = User.find_by_id(row[1])
-            log.exercise = Exercise.find_by_id(row[2])
-            log.date = row[3]
+            log.exercise = Exercise.find_by_id(row[3])
+            log.date = row[5]
         else:
             user = User.find_by_id(row[1])
-            exercise = Exercise.find_by_id(row[2])
-            log = Log(user, exercise, row[3])
+            exercise = Exercise.find_by_id(row[3])
+            log = Log(user, exercise, row[5])
             log.id = row[0]
             Log.all[log.id] = log
         return log
+    
 
     @classmethod
     def get_all(cls):
@@ -160,8 +178,13 @@ class Log:
             FROM logs
         """
         rows = CURSOR.execute(sql).fetchall()
+        i = 0
+        print("Date | User | Exercise")
+        while i < len(rows):
+            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
+            i += 1
 
-        return [Log.instance_from_db(row) for row in rows]
+        # return [Log.instance_from_db(row) for row in rows]
 
     @classmethod
     def find_by_id(cls, id):
@@ -173,4 +196,21 @@ class Log:
         """
 
         row = CURSOR.execute(sql, (id, )).fetchone()
+
         return Log.instance_from_db(row) if row else None
+
+    @classmethod
+    def find_by_name(cls, name):
+        """ Return a Log object corresponding to the table row matching the specified primary key """
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE user = ?
+        """
+
+        row = CURSOR.execute(sql, (name, )).fetchall()
+
+        return Log.instance_from_db(row) if row else None
+    
+
+    
