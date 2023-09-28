@@ -17,7 +17,7 @@ class Exercise:
         self.cals_burned = cals_burned
 
     def __repr__(self):
-        return f"{self.id}. {self.name}, {self.time} min, {self.category}, {self.intensity}, {self.cals_burned} cals"
+        return f"{self.id} | {self.name} | {self.time} min | {self.category} | {self.intensity} | {self.cals_burned} cals"
 
     @property
     def name(self):
@@ -222,12 +222,22 @@ class Exercise:
             FROM logs
             GROUP BY exercise_id
             ORDER BY count(*) desc
-            LIMIT 1
         """
-
-        most_used = CURSOR.execute(sql).fetchall() # Returns a list of tuples (Limit 1)
-        most_used_exercise = Exercise.find_by_id(most_used[0][0]) # Access exercise_id by bracket notation
-        return f"Most popular: {most_used_exercise.name} and used {most_used[0][1]} times."
+        
+        most_used = CURSOR.execute(sql).fetchall()
+        num_time = most_used[0][1]
+        
+        i = 0
+        most_used_list = []
+        while i < len(most_used):
+            if most_used[i][1] == num_time:
+                most_used_exercise = Exercise.find_by_id(most_used[i][0])
+                most_used_list.append(most_used_exercise)
+            i += 1
+    
+        print("Most popular exercises:")
+        for exercise in most_used_list:
+            print(f"- {exercise.name} completed {num_time} times!")
     
     @classmethod
     def least_popular(cls):
@@ -249,36 +259,11 @@ class Exercise:
                 least_used_exercise = Exercise.find_by_id(least_used[i][0])
                 least_used_list.append(least_used_exercise)
             i += 1
-        # return least_used_list
     
         print("Least popular exercises:")
         for exercise in least_used_list:
             print(f"- {exercise.name} completed only {num_time} times!")
     
-    @classmethod
-    def most_popular_v2(cls):
-        """ Return a list containing an Exercise object per row in the table """
-        sql = """
-            SELECT exercise_id, count(*) as exercise_id
-            FROM logs
-            GROUP BY exercise_id
-            ORDER BY count(*) desc
-        """
-        
-        least_used = CURSOR.execute(sql).fetchall()
-        num_time = least_used[0][1]
-        
-        i = 0
-        least_used_list = []
-        while i < len(least_used):
-            if least_used[i][1] == num_time:
-                least_used_exercise = Exercise.find_by_id(least_used[i][0])
-                least_used_list.append(least_used_exercise)
-            i += 1
-        # return least_used_list
-    
-        print("Most popular exercises:")
-        for exercise in least_used_list:
-            print(f"- {exercise.name} completed {num_time} times!")
+
 
     

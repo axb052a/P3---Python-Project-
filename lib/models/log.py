@@ -13,7 +13,7 @@ class Log:
         self.date = date
 
     def __repr__(self):
-        return f"{self.id}. User: {self.user.name}, Exercise: {self.exercise.name}, Date: {self.date}"
+        return f"{self.id} | User: {self.user.name} | Exercise: {self.exercise.name} | Date: {self.date}"
 
     @property
     def user(self):
@@ -142,18 +142,33 @@ class Log:
         """ Return a Log object having the attribute values from the table row """
 
         # Check the dictionary for an existing instance using the row's primary key
+        # log = Log.all.get(row[0])
+        # if log:
+        #     log.user = User.find_by_id(row[1])
+        #     log.exercise = Exercise.find_by_id(row[2])
+        #     log.date = row[3]
+        # else:
+        #     user = User.find_by_id(row[1])
+        #     exercise = Exercise.find_by_id(row[2])
+        #     log = Log(user, exercise, row[3])
+        #     log.id = row[0]
+        #     Log.all[log.id] = log
+        # return log
+
+        # Updated to reference additional table columns
         log = Log.all.get(row[0])
         if log:
             log.user = User.find_by_id(row[1])
-            log.exercise = Exercise.find_by_id(row[2])
-            log.date = row[3]
+            log.exercise = Exercise.find_by_id(row[3])
+            log.date = row[5]
         else:
             user = User.find_by_id(row[1])
-            exercise = Exercise.find_by_id(row[2])
-            log = Log(user, exercise, row[3])
+            exercise = Exercise.find_by_id(row[3])
+            log = Log(user, exercise, row[5])
             log.id = row[0]
             Log.all[log.id] = log
         return log
+    
 
     @classmethod
     def get_all(cls):
@@ -181,5 +196,21 @@ class Log:
         """
 
         row = CURSOR.execute(sql, (id, )).fetchone()
+
         return Log.instance_from_db(row) if row else None
+
+    @classmethod
+    def find_by_name(cls, name):
+        """ Return a Log object corresponding to the table row matching the specified primary key """
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE user = ?
+        """
+
+        row = CURSOR.execute(sql, (name, )).fetchall()
+
+        return Log.instance_from_db(row) if row else None
+    
+
     
