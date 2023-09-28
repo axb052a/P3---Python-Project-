@@ -17,6 +17,8 @@ from helpers import (
     get_log_by_id,
     update_log_by_id,
     delete_log_by_id,
+    show_popular,
+    least_popular
 )
 
 
@@ -50,6 +52,8 @@ def main():
                     list_exercises()
                 elif choice == "2":
                     print("Exercise Stats")
+                    show_popular()
+                    least_popular()
                 elif choice == "3":
                     get_exercise_by_name_or_id()
                 elif choice == "4":

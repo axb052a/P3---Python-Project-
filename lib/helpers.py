@@ -103,7 +103,7 @@ def find_most_and_least_popular_exercises():
     
     # Count the popularity of each exercise based on log entries
     for exercise in all_exercises:
-        log_entries = Log.find_by_exercise(exercise)
+        log_entries = Log.find_by_id(exercise)
         exercise_popularity[exercise.name] = len(log_entries)
 
     # Find the most and least popular exercises
@@ -125,9 +125,10 @@ def create_log():
         print("Error creating new log: ", exc)
 
 def list_logs():
-    logs = Log.get_all()
-    for log in logs:
-        print(log)
+    # logs = Log.get_all()
+    # for log in logs:
+    #     print(log)
+    Log.get_all()
 
 def get_log_by_id():
     log_id = input("Log ID: ")
@@ -176,3 +177,16 @@ def delete_log_by_id():
 def exit_program():
     print("See you next time for another workout!")
     exit()
+
+def show_popular():
+    Exercise.most_popular_v2()
+    # exercises = Exercise.most_popular()
+    # print(exercises)
+
+def least_popular():
+    Exercise.least_popular()
+    # exercises = Exercise.least_popular()
+    # print("Least popular exercises:")
+    # for exercise in exercises:
+    #     print(f"- {exercise.name}")
+    
