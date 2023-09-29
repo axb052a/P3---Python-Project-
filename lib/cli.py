@@ -1,8 +1,6 @@
 # lib/cli.py
-
 from models.exercise import Exercise
 from models.log import Log
-
 from helpers import (
     exit_program,
     create_exercise,
@@ -27,11 +25,10 @@ from helpers import (
     get_my_info
 )
 
-
 def main():
     home_menu()
     while True:
-        choice = input("> ")
+        choice = input("\033[33m> \033[0m")
         if choice == "x":
             exit_program()
         elif choice == "1":
@@ -39,32 +36,32 @@ def main():
                 login_user()
                 user_menu()
             except:
-                print("Login error. Please try again.\n[x] Return to menu")
+                print("\033[31mLogin error. Please try again.\n[x] Return to menu\033[0m")
+        
             while True:
-                choice = input("> ")
+                choice = input("\033[33m> \033[0m")
                 if choice == "1":
                     get_my_info()
                 elif choice == "2":
-                    print("My Stats")
+                    print("\033[36mMy Stats\033[0m")
                     get_user_recent_workout()
                 elif choice == "3":
-                    # get_user_logs()
                     get_user_workout_history()
                 elif choice == "4":
-                    print("All Users")
+                    print("\033[36mAll Users\033[0m")
                     list_users()
                 elif choice == "0" or "x":
                     main()
                 else:
-                    print("Invalid choice user_menu")
+                    print("\033[31mInvalid choice user_menu\033[0m")
         elif choice == "2":
             exercise_menu()
             while True:
-                choice = input("> ")
+                choice = input("\033[33m> \033[0m")
                 if choice == "1":
                     list_exercises()
                 elif choice == "2":
-                    print("Exercise Stats")
+                    print("\033[36mExercise Stats\033[0m")
                     show_popular()
                     least_popular()
                 elif choice == "3":
@@ -79,18 +76,20 @@ def main():
                 elif choice == "x":
                     main()
                 else:
-                    print("Invalid choice exercise_menu")
+                    print("\033[31mInvalid choice exercise_menu\033[0m")
         elif choice == "3":
             log_menu()  
             while True:
-                choice = input("> ")
+                choice = input("\033[33m> \033[0m")
                 if choice == "1":
                     list_logs()
                 elif choice == "2":
+                    print("\033[36mLog Entries\033[0m")
+                elif choice == "3":
                     # log_id = input("Enter the log ID: ")
                     # get_log_by_id(log_id) 
                     get_log_by_id() 
-                elif choice == "3":
+                elif choice == "4":
                     update_log_by_id() 
                 elif choice == "4":
                     delete_log_by_id()      
@@ -99,43 +98,41 @@ def main():
                 elif choice == "x":
                     main()
                 else:
-                    print("Invalid choice log_menu")
+                    print("\033[31mInvalid choice log_menu\033[0m")
         else:
-            print("Invalid choice")
-
+            print("\033[31mInvalid choice\033[0m")
 def home_menu():
-    print("Please select an option:")
-    print("[1] Users")
-    print("[2] Exercises")
-    print("[3] Logs")
-    print("[x] Exit App")
-
+    print("\033[36mPlease select an option:\033[0m")
+    print("\033[36m[1] Users\033[0m")
+    print("\033[36m[2] Exercises\033[0m")
+    print("\033[36m[3] Logs\033[0m")
+    print("\033[36m[x] Exit App\033[0m")
 def user_menu():
-    print("Please select an option:")
-    print("[1] My Info")
-    print("[2] My Stats")
-    print("[3] Workout History")
-    print("[4] All Users")
-    print("[x] Log Out")
-
+    print("\033[36mPlease select an option:\033[0m")
+    print("\033[36m[1] My Info\033[0m")
+    print("\033[36m[2] My Stats\033[0m")
+    print("\033[36m[3] Workout History\033[0m")
+    print("\033[36m[4] All Users\033[0m")
+    print("\033[36m[x] Log Out\033[0m")
 def exercise_menu():
-    print("Please select an option:")
-    print("[1] Exercises")
-    print("[2] Exercise Stats")
-    print("[3] Search for Exercise")
-    print("[4] Update Exercise")  
-    print("[5] Delete Exercise")      
-    print("[6] Create Exercise")
-    print("[x] Return to Home")
+    print("\033[36mPlease select an option:\033[0m")
+    print("\033[36m[1] Exercises\033[0m")
+    print("\033[36m[2] Exercise Stats\033[0m")
+    print("\033[36m[3] Search for Exercise\033[0m")
+    print("\033[36m[4] Update Exercise\033[0m")  
+    print("\033[36m[5] Delete Exercise\033[0m")      
+    print("\033[36m[6] Create Exercise\033[0m")
+    print("\033[36m[x] Return to Home\033[0m")
     
 def log_menu():
-    print("Please select an option:")
-    print("[1] Log History")
-    print("[2] Search for Log")
-    print("[3] Update Log")  
-    print("[4] Delete Log")      
-    print("[5] Create Log")
-    print("[x] Return to Home")
+    print("\033[36mPlease select an option:\033[0m")
+    print("\033[36m[1] Log History\033[0m")
+    print("\033[36m[2] Log Entries\033[0m")
+    print("\033[36m[3] Search for Log\033[0m")
+    print("\033[36m[4] Update Log\033[0m")  
+    print("\033[36m[5] Delete Log\033[0m")      
+    print("\033[36m[6] Create Log\033[0m")
+    print("\033[36m[x] Return to Home\033[0m")
 
 runner = """
                          .7Y5Y7.       
@@ -156,8 +153,6 @@ runner = """
                             """
 
 if __name__ == "__main__":
-    print("Welcome to PyFit! Track your fitness journey to help you reach your goals.")
+    print("\033[37mWelcome to PyFit! Track your fitness journey to help you reach your goals.\033[0m")
     print(runner)
     main()
-
-
