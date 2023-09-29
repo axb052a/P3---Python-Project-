@@ -7,7 +7,7 @@ from helpers import (
     list_exercises,
     get_exercise_by_name_or_id,
     update_exercise_by_name_or_id,
-    # delete_exercise_by_name_or_id,
+    delete_exercise_by_name_or_id,
     delete_exercise_with_logs,
     create_log, 
     list_logs,
@@ -112,6 +112,7 @@ def home_menu():
     print("\033[36m[x] Exit App\033[0m")
 
 def user_menu():
+
     print("\033[36mPlease select an option:\033[0m")
     print("\033[36m[1] My Info\033[0m")
     print("\033[36m[2] My Stats\033[0m")
@@ -120,6 +121,7 @@ def user_menu():
     print("\033[36m[5] Update an User\033[0m")
     print("\033[36m[6] Delete an User\033[0m")
     print("\033[36m[x] Log Out\033[0m")
+
 
 def exercise_menu():
     print("\033[36mPlease select an option:\033[0m")
