@@ -208,9 +208,13 @@ class Log:
             WHERE user = ?
         """
 
-        row = CURSOR.execute(sql, (name, )).fetchall()
-
-        return Log.instance_from_db(row) if row else None
+        rows = CURSOR.execute(sql, (name, )).fetchall()
+        
+        i = 0
+        print("Date | User | Exercise")
+        while i < len(rows):
+            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
+            i += 1
     
 
     

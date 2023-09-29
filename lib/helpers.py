@@ -4,52 +4,48 @@ from models.exercise import Exercise
 from models.log import Log
 from models.user import User
 
-from rich import print
-from rich.console import Console
-from rich.table import Table
-
 logged_in_user_id = [0]
 open = "\033[34m"
 close = "\33[0m"
 
 def create_exercise():
-#  category not in Exercise.CATEGORY 
-#  intensity not in Exercise.INTENSITY and 
     print("Create Exercise")
     name = input(f"{open} Enter Exercise: {close}")
     while not isinstance(name, str) or len(name) >= 20:
         print("Name must be greater than 0 and less than or equal to 20 characters.")
-        name = input("Exercise: ")
-    time = input("Duration (in minutes): ")
-    try:
-        time = int(time)
-    except:
-        print("Duration must be a number")
-        time = input("Duration (in minutes): ")
-    category = input("Choose a category [1] Cardio, [2] Strength: ")
-    try:
-        if int(category) not in range(1, len(Exercise.CATEGORY)+1):
-            print("Enter a number the represents the exercise category")
-            category = input("Choose a category [1] Cardio, [2] Strength: ")
-    except ValueError:
-        print("Enter a number the represents the exercise category")
-        category = input("Choose a category [1] Cardio, [2] Strength: ")
-    intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
-    while int(intensity) not in range(1, len(Exercise.INTENSITY)+1):
-        print("Enter a number that represents the exercise intensity")
-        intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
-    cals_burned = input("Calories Burned: ")
-    try:
-        cals_burned = int(cals_burned)
-    except:
-        print("Enter a number for calories burned")
-        cals_burned = input("Calories Burned: ")
-
-    # Allow choices to be numbers
-    if category not in Exercise.CATEGORY and 0 < int(category) <=len(Exercise.CATEGORY):
-        category = Exercise.CATEGORY[int(category) - 1]
-    if intensity not in Exercise.INTENSITY and 0 < int(intensity) <= len(Exercise.INTENSITY):
-        intensity = Exercise.INTENSITY[int(intensity) -1]
+        name = input("Exercise: ")   
+    while True:
+        try:
+            time = int(input("Duration (in minutes): "))
+            if 0 < time:
+                time
+                break
+        except ValueError:
+            print("Duration must be a number")   
+    while True:
+        try:
+            category = int(input("Choose a category [1] Cardio, [2] Strength: "))
+            if category in range(1, len(Exercise.CATEGORY) +1):
+                category
+                break
+        except ValueError:
+            print("Enter a number that corresponds to the exercise category")
+    while True:
+        try:
+            intensity = int(input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): "))
+            if intensity in range(1, len(Exercise.INTENSITY) +1):
+                intensity
+                break
+        except ValueError:
+            print("Enter a number that corresponds to the exercise intensity")
+    while True:
+        try:
+            cals_burned = int(input("Calories Burned: "))
+            if 0 < cals_burned:
+                cals_burned
+                break
+        except ValueError:
+            print("Calories burned must be a number") 
 
     try:
         exercise = Exercise.create(name, time, category, intensity, cals_burned)
@@ -248,7 +244,7 @@ def create_user():
     try:
         search_for_user = User.find_by_name(name)
         if search_for_user.name == name:
-            print(f"Error creating new user. User already exists.\nWelcome back, {search_for_user.name}!")
+            print(f"Error creating new user. User already exists.")
             logged_in_user_id[0] = search_for_user.id
 
     except:
@@ -262,7 +258,6 @@ def create_user():
         weight = int(weight)
 
         try:
-            
             user = User.create_user(name, height_ft, height_inches, weight)
             print(f"Welcome to PyFit, {user.name}!")
             logged_in_user_id[0] = user.id
@@ -270,27 +265,19 @@ def create_user():
             print("Error creating new user: ", exc)
 
 def login_user():
-    print("Login User")
-    user_status = input("New User? [y/n] ")
-    if user_status == "y":
-        create_user()
-    elif user_status == "n":
-        name = input("Name: ")
-        try:
-            user = User.find_by_name(name)
-            logged_in_user_id[0] = user.id
-            print(f"Welcome back, {user.name}!")
-        except:
-            raise Exception("Unable to find user. Please try again.")
+    name = input("Name: ")
+    user = User.find_by_name(name)
+    if user == None:
+        print("Unable to find user. [x] Return to Home")
     else:
-        print("Invalid menu selection")
+        logged_in_user_id[0] = user.id
+        print(f"Welcome back, {user.name} (ID: {user.id})!")
 
 def get_user_logs():
     print("Get User Logs")
-    name = input("Name: ")
+    user = User.find_by_id(logged_in_user_id[0])
     try:
-        log = Log.find_by_name(name)
-        print(f"Date | User | Exercise\n{log.date} | {log.user.name} | {log.exercise.name}") if log else print(f"Logs for {name} not found")
+        Log.find_by_name(user.name)
     except:
         print(f"Invalid name")
 
@@ -299,5 +286,3 @@ def get_my_info():
     my_info = User.find_by_id(logged_in_user_id[0])
     print("ID | User | Height | Weight (lbs)")
     print(my_info)
-
-    
