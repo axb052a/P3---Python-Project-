@@ -14,7 +14,7 @@ def create_exercise():
         try:
             name = input(f"{open} Enter Exercise: {close}")
             if isinstance(name, str) and 0 < len(name) <= 20:
-                name.title()
+                name = name.title()
                 break
         except:
             raise Exception("Name must be greater than 0 and less than or equal to 20 characters.")   
@@ -25,23 +25,29 @@ def create_exercise():
                 time
                 break
         except ValueError:
-            print("Duration must be a number")   
+            print("Duration must be a number") 
     while True:
         try:
-            category = int(input("Choose a category [1] Cardio, [2] Strength: "))
-            if category in range(1, len(Exercise.CATEGORY) +1):
-                category = Exercise.CATEGORY[category - 1]
+            category = input("Choose a category [1] Cardio, [2] Strength: ")
+            if category.title() in Exercise.CATEGORY:
+                category = category.title()
+                break
+            elif int(category) in range(1, len(Exercise.CATEGORY) +1):
+                category = Exercise.CATEGORY[int(category) - 1]
                 break
         except ValueError:
-            print("Enter a number that corresponds to the exercise category")
+            print("Enter a number or choose category that corresponds to the exercise category")  
     while True:
         try:
-            intensity = int(input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): "))
-            if intensity in range(1, len(Exercise.INTENSITY) +1):
-                intensity = Exercise.INTENSITY[intensity -1]
+            intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
+            if intensity.title() in Exercise.INTENSITY:
+                intensity = intensity.title()
+                break
+            elif int(intensity) in range(1, len(Exercise.INTENSITY) +1):
+                intensity = Exercise.INTENSITY[int(intensity) -1]
                 break
         except ValueError:
-            print("Enter a number that corresponds to the exercise intensity")
+            print("Enter a number or choose level that corresponds to the exercise intensity")
     while True:
         try:
             cals_burned = int(input("Calories Burned: "))
@@ -113,20 +119,26 @@ def collect_updates(exercise):
             print("Duration must be a number")   
     while True:
         try:
-            category = int(input("Choose a category [1] Cardio, [2] Strength: "))
-            if category in range(1, len(Exercise.CATEGORY) +1):
-                exercise.category = Exercise.CATEGORY[category - 1]
+            category = input("Choose a category [1] Cardio, [2] Strength: ")
+            if category.title() in Exercise.CATEGORY:
+                exercise.category = category.title()
+                break
+            elif int(category) in range(1, len(Exercise.CATEGORY) +1):
+                exercise.category = Exercise.CATEGORY[int(category) - 1]
                 break
         except ValueError:
-            print("Enter a number that corresponds to the exercise category")
+            print("Enter a number or choose category that corresponds to the exercise category")  
     while True:
         try:
-            intensity = int(input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): "))
-            if intensity in range(1, len(Exercise.INTENSITY) +1):
-                exercise.intensity = Exercise.INTENSITY[intensity - 1]
+            intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
+            if intensity.title() in Exercise.INTENSITY:
+                exercise.intensity = intensity.title()
+                break
+            elif int(intensity) in range(1, len(Exercise.INTENSITY) +1):
+                exercise.intensity = Exercise.INTENSITY[int(intensity) -1]
                 break
         except ValueError:
-            print("Enter a number that corresponds to the exercise intensity")
+            print("Enter a number or choose level that corresponds to the exercise intensity")
     while True:
         try:
             cals_burned = int(input("Calories Burned: "))
