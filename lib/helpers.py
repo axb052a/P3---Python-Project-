@@ -104,7 +104,7 @@ def update_exercise_by_name_or_id():
             collect_updates(exercise)
         except Exception as exc:
             print("\033[31m Error updating exercise \033[0m", exc)
-            
+
 def collect_updates(exercise):
     while True:
         try:
@@ -174,7 +174,7 @@ def delete_exercise_by_name_or_id():
             print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
         except Exception as exc:
             print("Error deleting exercise")
-            
+          
 def find_most_and_least_popular_exercises():
     # Get a list of all exercises
     all_exercises = Exercise.get_all()
@@ -194,7 +194,6 @@ def find_most_and_least_popular_exercises():
 def delete_exercise_with_logs():
     print(f"{open}Delete Exercise with Logs{close}")
     name_or_id = input(f"{open}Exercise or ID: {close}")
-
     try:
         id_ = int(name_or_id)
         exercise = Exercise.find_by_id(id_)
@@ -222,22 +221,17 @@ def create_log():
 
         user_instance = User.find_by_id(user_id)
 
- # Something might need to be updated
-        log = Log.create(user_instance, exercise_instance, date)
-        print(f"Log created successfully. {congrats_emoji}")
-
         # Check if the exercise exists either by ID or name
-        exercise_instance = Exercise.find_by_id(exercise_identifier)
+        exercise_instance = Exercise.find_by_id(exercise_id)
         if not exercise_instance:
-            exercise_instance = Exercise.find_by_name(exercise_identifier.title())
-
+            exercise_instance = Exercise.find_by_name(exercise_id.title())
 
         if not exercise_instance:
-            print("\033[31mInvalid exercise. Please enter a valid exercise ID or name.\033[0m")
+            print("Invalid exercise. Please enter a valid exercise ID or name.")
         else:
             # Create the log with the valid exercise
             log = Log.create(user_instance, exercise_instance, date)
-            print("\033[32m{log} created successfully.\033[0m")
+            print(f"\033[32m{log} created successfully.\033[0m")
     except Exception as exc:
         print("\033[31mError creating new log: \033[0m", exc)
 
@@ -273,10 +267,25 @@ def collect_log_updates(log):
     try:
         date = input(f"{open}New date for Log ID {log.id} (YYYY-MM-DD): {close}")
         log.date = date
+        # Prompt for updating exercise
+        update_exercise = input(f"{open}Do you want to update the exercise for this log? (y/n): {close}")
+        if update_exercise.lower() == 'y':
+            exercise_id_or_name = input(f"{open}Enter the new Exercise ID or Name: {close}")
+            exercise = Exercise.find_by_id(exercise_id_or_name)
+            if not exercise:
+                exercise = Exercise.find_by_name(exercise_id_or_name.title())
+
+            if exercise:
+                log.exercise = exercise
+            else:
+                print("\033[31mInvalid exercise. The exercise will not be updated.\033[0m")
+
+        # Update the log entry in the database
         log.update()
         print(f"\033[32mLog entry updated successfully for Log ID {log.id}.\033[0m")
     except Exception as exc:
         print(f"\033[31mError updating log entry: {exc}\033[0m")
+
 def delete_log_by_id():
     print(f"{open}Delete Log by ID{close}")
     log_id = input(f"{open}Log ID: {close}")
@@ -406,4 +415,93 @@ def get_user_recent_workout(user):
         print(f"{open}Exercise: {recent_log.exercise.name}{close}")
     else:
         print("\033[31mNo workout history found for this user.\033[0m")
+    
+def delete_user_with_logs():
+    print("Delete User with Logs")
+    user_name_or_id = input("User Name or ID: ")
+
+    try:
+        # Try to convert the input to an integer; if successful, it's an ID.
+        user_identifier = int(user_name_or_id)
+
+        user = User.find_by_id(user_identifier)
+        if user:
+            # Find and delete logs associated with the user
+            logs = Log.find_by_user(user)
+            for log in logs:
+                Log.delete(log)
+
+            # Delete the user itself
+            User.delete(user)
+            print(f"{user.name} and their associated logs have been deleted")
+        else:
+            print(f"User with ID {user_identifier} not found")
+    except ValueError:
+        # If the input couldn't be converted to an integer, assume it's a name.
+        user = User.find_by_name(user_name_or_id)
+        if user:
+            # Find and delete logs associated with the user
+            logs = Log.find_by_user(user)
+            for log in logs:
+                Log.delete(log)
+
+            # Delete the user itself
+            User.delete(user)
+            print(f"{user.name} and their associated logs have been deleted")
+        else:
+            print(f"User '{user_name_or_id}' not found")
+    except Exception as exc:
+        print("Error deleting user and logs:", exc)
+
+import copy
+
+def update_user_info_and_logs():
+    print(f"{open}Update User Information{close}")
+    user_id = logged_in_user_id[0]
+    user = User.find_by_id(user_id)
+
+    if not user:
+        print("\033[31mUser not found\033[0m")
+        return
+
+    # Display current user information
+    print(f"Current User Information:")
+    print(user)
+
+    # Create a copy of the user before the update for reference
+    old_user = copy.deepcopy(user)
+
+    # Collect updates for user information
+    name = input(f"{open}New Name: {close}")
+    height_ft = input(f"{open}New Height (feet): {close}")
+    height_inches = input(f"{open}New Height (inches): {close}")
+    weight = input(f"{open}New Weight (lbs): {close}")
+
+    # Update user instance
+    user.name = name
+    user.height_ft = int(height_ft)
+    user.height_inches = int(height_inches)
+    user.weight = int(weight)
+
+    try:
+        # Update user in the database
+        user.update()
+        print(f"\033[32mUser information updated successfully!\033[0m")
+    except Exception as exc:
+        print(f"\033[31mError updating user information: {exc}\033[0m")
+        return
+
+    # Update corresponding log entries
+    logs = Log.find_by_user(old_user)  # Find logs associated with the old user instance
+    for log in logs:
+        try:
+            # Create a copy of the log before the update
+            old_log = copy.deepcopy(log)
+
+            # Update log entry with the new user information
+            log.user = user
+            log.update()
+
+        except Exception as exc:
+            print(f"\033[31mError updating log entry: {exc}\033[0m")
 
