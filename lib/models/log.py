@@ -226,5 +226,3 @@ class Log:
         """
         rows = CURSOR.execute(sql, (user.id,)).fetchall()
         return [Log.instance_from_db(row) for row in rows]
-
-

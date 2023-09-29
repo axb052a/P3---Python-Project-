@@ -196,3 +196,4 @@ class User:
         """
         row = CURSOR.execute(sql, (name, )).fetchone()
         return User.instance_from_db(row) if row else None
+
