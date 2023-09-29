@@ -55,3 +55,4 @@ Starter data to help fill in SQL database tables
 ## Resources
 
 - [Github repo: Pyfit](https://github.com/axb052a/P3---Python-Project-)
+- [Styling](https://sparkbyexamples.com/python/print-colored-text-to-the-terminal-in-python/)
