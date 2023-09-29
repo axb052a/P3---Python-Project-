@@ -7,7 +7,8 @@ from helpers import (
     list_exercises,
     get_exercise_by_name_or_id,
     update_exercise_by_name_or_id,
-    delete_exercise_by_name_or_id,
+    # delete_exercise_by_name_or_id,
+    delete_exercise_with_logs,
     create_log, 
     list_logs,
     get_log_by_id,
@@ -18,7 +19,9 @@ from helpers import (
     list_users,
     create_user,
     login_user,
-    get_user_logs,
+    # get_user_logs,
+    get_user_recent_workout,
+    get_user_workout_history,
     get_my_info
 )
 
@@ -34,14 +37,16 @@ def main():
                 user_menu()
             except:
                 print("\033[31mLogin error. Please try again.\n[x] Return to menu\033[0m")
+        
             while True:
                 choice = input("\033[33m> \033[0m")
                 if choice == "1":
                     get_my_info()
                 elif choice == "2":
                     print("\033[36mMy Stats\033[0m")
+                    get_user_recent_workout()
                 elif choice == "3":
-                    get_user_logs()
+                    get_user_workout_history()
                 elif choice == "4":
                     print("\033[36mAll Users\033[0m")
                     list_users()
@@ -64,7 +69,8 @@ def main():
                 elif choice == "4":
                     update_exercise_by_name_or_id()                    
                 elif choice == "5":
-                    delete_exercise_by_name_or_id()
+                    # delete_exercise_by_name_or_id()
+                    delete_exercise_with_logs()
                 elif choice == "6":
                     create_exercise()
                 elif choice == "x":
@@ -85,9 +91,9 @@ def main():
                     get_log_by_id() 
                 elif choice == "4":
                     update_log_by_id() 
-                elif choice == "5":
+                elif choice == "4":
                     delete_log_by_id()      
-                elif choice == "6":
+                elif choice == "5":
                     create_log()
                 elif choice == "x":
                     main()
@@ -127,6 +133,7 @@ def log_menu():
     print("\033[36m[5] Delete Log\033[0m")      
     print("\033[36m[6] Create Log\033[0m")
     print("\033[36m[x] Return to Home\033[0m")
+
 runner = """
                          .7Y5Y7.       
                        :#@@@@@#^      
@@ -144,6 +151,7 @@ runner = """
                           .P@@&:      
                             ~7:  
                             """
+
 if __name__ == "__main__":
     print("\033[37mWelcome to PyFit! Track your fitness journey to help you reach your goals.\033[0m")
     print(runner)

@@ -3,7 +3,10 @@ from models.__init__ import CURSOR, CONN
 # Establish a connection to the SQLite database (create if not exists)
 # conn = sqlite3.connect('fitness_tracker.db')
 class User:
+
     all = {}
+
+
     def __init__(self, name, height_ft, height_inches, weight, id=None):
         self.id = id
         self.name = name
@@ -26,6 +29,7 @@ class User:
         """
         rows = CURSOR.execute(sql).fetchall()
         return [User.instance_from_db(row) for row in rows]
+      
     @property
     def name(self):
         return self._name
@@ -113,6 +117,7 @@ class User:
         
         self.id = CURSOR.lastrowid
         User.all[self.id] = self
+
     @classmethod
     def create_user(cls, name, height_ft, height_inches, weight):
         """ Initialize a new User instance and save the object to the database """
@@ -136,11 +141,15 @@ class User:
             """
             CURSOR.execute(sql, (self.id,))
             CONN.commit()
+
             del User.all[self.id]
+
             self.id = None
+
     @classmethod
     def instance_from_db(cls, row):
         """ Return User object having the attribute values from the table row """
+
         # Check the dictionary for an existing instance using the row's primary key
         user = User.all.get(row[0])
         if user:
@@ -162,6 +171,7 @@ class User:
             FROM users
             WHERE id = ?
         """
+
         row = CURSOR.execute(sql, (id, )).fetchone()
         return User.instance_from_db(row) if row else None
     
@@ -173,6 +183,7 @@ class User:
             FROM users
         """
         rows = CURSOR.execute(sql).fetchall()
+
         return [User.instance_from_db(row) for row in rows]
     
     @classmethod

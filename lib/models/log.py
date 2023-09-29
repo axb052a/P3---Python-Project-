@@ -10,6 +10,7 @@ class Log:
         self.date = date
     def __repr__(self):
         return f"\033[35m {self.id} | User: {self.user.name} | Exercise: {self.exercise.name} | Date: {self.date}\033[0m"
+
     @property
     def user(self):
         return self._user
@@ -47,6 +48,7 @@ class Log:
         #     FOREIGN KEY (user_id) REFERENCES users(id),
         #     FOREIGN KEY (exercise_id) REFERENCES exercises(id))        
         # """
+
         sql = """
             CREATE TABLE IF NOT EXISTS logs (
             id INTEGER PRIMARY KEY,
@@ -77,14 +79,18 @@ class Log:
         #     INSERT INTO logs (user_id, exercise_id, date)
         #     VALUES (?, ?, ?)
         # """
+
         # CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date))
         # CONN.commit()
+
         sql = """
             INSERT INTO logs (user_id, user, exercise_id, exercise, date)
             VALUES (?, ?, ?, ?, ?)
         """
+
         CURSOR.execute(sql, (self.user.id, self.user.name, self.exercise.id, self.exercise.name, self.date))
         CONN.commit()
+
         self.id = CURSOR.lastrowid
         Log.all[self.id] = self
     
@@ -134,6 +140,7 @@ class Log:
         #     log.id = row[0]
         #     Log.all[log.id] = log
         # return log
+
         # Updated to reference additional table columns
         log = Log.all.get(row[0])
         if log:
@@ -159,9 +166,11 @@ class Log:
         i = 0
         print("\033[35m Date | User | Exercise \033[0m")
         while i < len(rows):
-            print(f"\033[35m{rows[i][5]} | {rows[i][2]} | {rows[i][4]}\033[0m")
+            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
             i += 1
+
         # return [Log.instance_from_db(row) for row in rows]
+
     @classmethod
     def find_by_id(cls, id):
         """ Return a Log object corresponding to the table row matching the specified primary key """
@@ -171,7 +180,9 @@ class Log:
             WHERE id = ?
         """
         row = CURSOR.execute(sql, (id, )).fetchone()
+
         return Log.instance_from_db(row) if row else None
+
     @classmethod
     def find_by_name(cls, name):
         """ Return a Log object corresponding to the table row matching the specified primary key """
@@ -180,5 +191,31 @@ class Log:
             FROM logs
             WHERE user = ?
         """
+
         row = CURSOR.execute(sql, (name, )).fetchall()
+
         return Log.instance_from_db(row) if row else None
+
+    @classmethod
+    def find_by_exercise(cls, exercise):
+        """Return a list of logs associated with the given exercise."""
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE exercise_id = ?
+        """
+        rows = CURSOR.execute(sql, (exercise.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]
+    
+    @classmethod
+    def find_by_user(cls, user):
+        """Return a list of logs associated with the given user."""
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE user_id = ?
+        """
+        rows = CURSOR.execute(sql, (user.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]
+
+

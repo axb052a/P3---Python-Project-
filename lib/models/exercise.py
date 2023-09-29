@@ -14,6 +14,7 @@ class Exercise:
         self.cals_burned = cals_burned
     def __repr__(self):
         return f"\033[35m {self.id} | {self.name} | {self.time} min | {self.category} | {self.intensity} | {self.cals_burned} cals\033[0m"
+
     @property
     def name(self):
         return self._name
