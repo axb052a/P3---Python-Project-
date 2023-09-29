@@ -212,5 +212,26 @@ class Log:
 
         return Log.instance_from_db(row) if row else None
     
+    @classmethod
+    def find_by_exercise(cls, exercise):
+        """Return a list of logs associated with the given exercise."""
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE exercise_id = ?
+        """
+        rows = CURSOR.execute(sql, (exercise.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]
+    
+    @classmethod
+    def find_by_user(cls, user):
+        """Return a list of logs associated with the given user."""
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE user_id = ?
+        """
+        rows = CURSOR.execute(sql, (user.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]
 
     
