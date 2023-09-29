@@ -7,7 +7,6 @@ from helpers import (
     list_exercises,
     get_exercise_by_name_or_id,
     update_exercise_by_name_or_id,
-    delete_exercise_by_name_or_id,
     delete_exercise_with_logs,
     create_log, 
     list_logs,
@@ -17,9 +16,8 @@ from helpers import (
     show_popular,
     least_popular,
     list_users,
-    # create_user,
+    create_user,
     login_user,
-    # get_user_logs,
     display_recent_workout,
     get_user_workout_history,
     update_user_info_and_logs,
@@ -27,83 +25,7 @@ from helpers import (
     get_my_info
 )
 
-# def main():
-#     home_menu()
-#     while True:
-#         choice = input("\033[33m> \033[0m")
-#         if choice == "x":
-#             exit_program()
-#         elif choice == "1":
-#             try:
-#                 login_user()
-#                 user_menu()
-#             except:
-#                 print("\033[31mLogin error. Please try again.\n[x] Return to menu\033[0m")
-#             while True:
-#                 choice = input("\033[33m> \033[0m")
-#                 if choice == "1":
-#                     get_my_info()
-#                 elif choice == "2":
-#                     print("\033[36mMy Stats\033[0m")
-#                     display_recent_workout()
-#                 elif choice == "3":
-#                     get_user_workout_history()
-#                 elif choice == "4":
-#                     print("\033[36mAll Users\033[0m")
-#                     list_users()
-#                 elif choice == "5":
-#                     update_user_info_and_logs()
-#                 elif choice == "6":
-#                     delete_user_with_logs()
-#                 elif choice == "0" or "x":
-#                     main()
-#                 else:
-#                     print("\033[31mInvalid choice user_menu\033[0m")
-#         elif choice == "2":
-#             exercise_menu()
-#             while True:
-#                 choice = input("\033[33m> \033[0m")
-#                 if choice == "1":
-#                     list_exercises()
-#                 elif choice == "2":
-#                     print("\033[36mExercise Stats\033[0m")
-#                     show_popular()
-#                     least_popular()
-#                 elif choice == "3":
-#                     get_exercise_by_name_or_id()
-#                 elif choice == "4":
-#                     update_exercise_by_name_or_id()                    
-#                 elif choice == "5":
-#                     # delete_exercise_by_name_or_id()
-#                     delete_exercise_with_logs()
-#                 elif choice == "6":
-#                     create_exercise()
-#                 elif choice == "x":
-#                     main()
-#                 else:
-#                     print("\033[31mInvalid choice exercise_menu\033[0m")
-#         elif choice == "3":
-#             log_menu()  
-#             while True:
-#                 choice = input("\033[33m> \033[0m")
-#                 if choice == "1":
-#                     list_logs()
-#                 elif choice == "2":
-#                     # log_id = input("Enter the log ID: ")
-#                     # get_log_by_id(log_id) 
-#                     get_log_by_id() 
-#                 elif choice == "3":
-#                     update_log_by_id() 
-#                 elif choice == "4":
-#                     delete_log_by_id()      
-#                 elif choice == "5":
-#                     create_log()
-#                 elif choice == "x":
-#                     main()
-#                 else:
-#                     print("\033[31mInvalid choice log_menu\033[0m")
-                   
-
+                
 def main():
     while True:
         print("\033[36mPlease select an option:\033[0m")
@@ -149,19 +71,17 @@ def user_menu():
         if choice == "1":
             get_my_info()
         elif choice == "2":
-            get_user_recent_workout()
+            display_recent_workout()
         elif choice == "3":
-            create_log()
-        elif choice == "4":
-            # get_user_logs()
             get_user_workout_history()
-        elif choice == "5":
+        elif choice == "4":
             print("All Users")
             list_users()
+        elif choice == "5":
+            update_user_info_and_logs()
         elif choice == "6":
-            update_user()
-        elif choice == "7":
             print("Delete User")
+            delete_user_with_logs()
         elif choice == "0" or "x":
             main()
         else:
@@ -190,7 +110,7 @@ def exercise_menu():
         elif choice == "4":
             update_exercise_by_name_or_id()                    
         elif choice == "5":
-            delete_exercise_by_name_or_id()
+            delete_exercise_with_logs()
         elif choice == "6":
             create_exercise()
         elif choice == "0" or "x":
