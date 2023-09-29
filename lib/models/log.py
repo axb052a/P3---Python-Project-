@@ -179,9 +179,9 @@ class Log:
         """
         rows = CURSOR.execute(sql).fetchall()
         i = 0
-        print("Date | User | Exercise")
+        print("ID | Date | User | Exercise")
         while i < len(rows):
-            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
+            print(f"{rows[i][0]} | {rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
             i += 1
 
         # return [Log.instance_from_db(row) for row in rows]
@@ -216,5 +216,20 @@ class Log:
             print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
             i += 1
     
+    @classmethod
+    def find_by_user_id(cls, id):
+        """ Return a Log object corresponding to the table row matching the specified primary key """
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE user_id = ?
+        """
 
+        rows = CURSOR.execute(sql, (id, )).fetchall()
+        
+        i = 0
+        print("Date | User | Exercise")
+        while i < len(rows):
+            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
+            i += 1
     

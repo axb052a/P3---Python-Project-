@@ -7,12 +7,16 @@ from models.user import User
 logged_in_user_id = [0]
 open = "\033[34m"
 close = "\33[0m"
+cardio_emoji = "🏃🏻‍♂️"
+strength_emoji = "🏋🏻‍♂️"
+congrats_emoji = "🎉"
+waving_emoji = "👋"
 
 def create_exercise():
     print("Create Exercise")
     while True:
         try:
-            name = input(f"{open} Enter Exercise: {close}")
+            name = input(f"{open}Enter Exercise: {close}")
             if isinstance(name, str) and 0 < len(name) <= 20:
                 name = name.title()
                 break
@@ -59,7 +63,10 @@ def create_exercise():
 
     try:
         exercise = Exercise.create(name, time, category, intensity, cals_burned)
-        print(f"Success: {exercise.name} is now available! 🏃🏻‍♂️")
+        if exercise.category == "Cardio":
+            print(f"Success: {exercise.name} is now available! {cardio_emoji}")
+        elif exercise.category == "Strength":
+            print(f"Success: {exercise.name} is now available! {strength_emoji}")
     except Exception as exc:
         print("Error creating new exercise: ", exc)
 
@@ -103,7 +110,7 @@ def update_exercise_by_name_or_id():
 def collect_updates(exercise):
     while True:
         try:
-            name = input(f"{open} Update {exercise.name}: {close}")
+            name = input(f"{open}Update {exercise.name}: {close}")
             if isinstance(name, str) and 0 < len(name) <= 20:
                 exercise.name = name.title()
                 break
@@ -149,7 +156,7 @@ def collect_updates(exercise):
             print("Calories burned must be a number")     
 
     """ Exercise instance updated in database with .update() """
-    exercise.update()
+    Exercise.update(exercise)
     print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
 
 def delete_exercise_by_name_or_id():
@@ -200,16 +207,13 @@ def create_log():
         exercise_instance = Exercise.find_by_id(exercise_id)
 
         log = Log.create(user_instance, exercise_instance, date)
-        print("Log created successfully.")
+        print(f"Log created successfully. {congrats_emoji}")
 
     except Exception as exc:
         print("Error creating new log: ", exc)
 
 def list_logs():
     print("Logs")
-    # logs = Log.get_all()
-    # for log in logs:
-    #     print(log)
     Log.get_all()
 
 def get_log_by_id():
@@ -239,7 +243,7 @@ def collect_log_updates(log):
     try:
         date = input(f"New date for Log ID {log.id} (YYYY-MM-DD): ")
         log.date = date
-        log.update()
+        Log.update(log)
         print(f"Log entry updated successfully for Log ID {log.id}.")
     except Exception as exc:
         print(f"Error updating log entry: {exc}")
@@ -260,7 +264,7 @@ def delete_log_by_id():
 
 
 def exit_program():
-    print("See you next time for another workout!")
+    print(f"See you next time for another workout! {waving_emoji}")
     exit()
 
 def show_popular():
@@ -303,6 +307,7 @@ def create_user():
         except Exception as exc:
             print("Error creating new user: ", exc)
 
+
 def login_user():
     name = input("Name: ")
     user = User.find_by_name(name)
@@ -314,9 +319,8 @@ def login_user():
 
 def get_user_logs():
     print("Get User Logs")
-    user = User.find_by_id(logged_in_user_id[0])
     try:
-        Log.find_by_name(user.name)
+        Log.find_by_user_id(logged_in_user_id[0])
     except:
         print(f"Invalid name")
 
@@ -325,3 +329,37 @@ def get_my_info():
     my_info = User.find_by_id(logged_in_user_id[0])
     print("ID | User | Height | Weight (lbs)")
     print(my_info)
+
+def update_user():
+    print("Update User")
+    
+    update_user = User.find_by_id(logged_in_user_id[0])
+    while True:
+        try:
+            name = input(f"{open}Update {update_user.name} name: {close}")
+            if isinstance(name, str) and 0 < len(name) <= 20:
+                update_user.name = name.title()
+                break
+        except:
+            raise Exception("Name must be greater than 0 and less than or equal to 20 characters.")   
+    while True:
+        try:
+            height = int(input(f"{open}Update {update_user.name} height (inches): {close}"))
+            if 0 < height:
+                update_user.height_ft = round(height/12)
+                update_user.height_inches = height - update_user.height_ft * 12
+                break
+        except:
+            raise Exception("Height must be a number greater than 0.")
+    while True:
+        try:
+            weight = int(input(f"{open}Update {update_user.name} weight (lbs): {close}"))
+            if 0 < weight:
+                update_user.weight = weight
+                break
+        except:
+            raise Exception("Weight must be a number greater than 0.")
+   
+    """ Exercise instance updated in database with .update() """
+    User.update(update_user)
+    print(f"{update_user.name} has been updated!") if update_user else print(f"User {name} not found")

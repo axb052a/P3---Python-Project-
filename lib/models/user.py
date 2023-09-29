@@ -137,7 +137,7 @@ class User:
     def update(self):
             """Update the table row corresponding to the current User instance."""
             sql = """
-                UPDATE user
+                UPDATE users
                 SET name = ?, height_ft = ?, height_inches = ?, weight = ?
                 WHERE id = ?
             """
