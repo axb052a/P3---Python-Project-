@@ -2,14 +2,13 @@
 
 ## Summary
 
+
 Pyfit is a CLI application fitness tracker. A user can pick from various exercises that range from beginner to advanced intensity. Each workout displays its name, duration, intensity, calories burned and will either be a Strength or Cardio type. Users are able to add workouts and even check their workout history. Pyfit is meant to guide and help you reach your Fitness Goals. 
 
----
-
 ## Requirements
-
-- Python 3.x 
+- Python 3.x
 - SQLlite
+
 
 ## Installation
 
@@ -21,6 +20,7 @@ To run the Program, the following commands must be entered:
  pipenv shell    
 ```
 2. Once the shell has been run: 
+
 ```
  python lib/seed.py 
  python lib/cli.py 

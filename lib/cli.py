@@ -1,15 +1,14 @@
 # lib/cli.py
-
 from models.exercise import Exercise
 from models.log import Log
-
 from helpers import (
     exit_program,
     create_exercise,
     list_exercises,
     get_exercise_by_name_or_id,
     update_exercise_by_name_or_id,
-    delete_exercise_by_name_or_id,
+    # delete_exercise_by_name_or_id,
+    delete_exercise_with_logs,
     create_log, 
     list_logs,
     get_log_by_id,
@@ -20,9 +19,10 @@ from helpers import (
     list_users,
     create_user,
     login_user,
-    get_user_logs,
-    get_my_info,
-    update_user
+    # get_user_logs,
+    get_user_recent_workout,
+    get_user_workout_history,
+    get_my_info
 )
 
 def main():
@@ -163,8 +163,6 @@ runner = """
                             """
 
 if __name__ == "__main__":
-    print("Welcome to PyFit! Track your fitness journey to help you reach your goals.")
+    print("\033[37mWelcome to PyFit! Track your fitness journey to help you reach your goals.\033[0m")
     print(runner)
     main()
-
-

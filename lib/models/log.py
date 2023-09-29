@@ -1,51 +1,41 @@
 from models.__init__ import CURSOR, CONN
 from models.user import User
 from models.exercise import Exercise
-
 class Log:
-
     all = {}
-
     def __init__(self, user, exercise, date, id=None):
         self.id = id
         self.user = user
         self.exercise = exercise
         self.date = date
-
     def __repr__(self):
-        return f"{self.id} | User: {self.user.name} | Exercise: {self.exercise.name} | Date: {self.date}"
+        return f"\033[35m {self.id} | User: {self.user.name} | Exercise: {self.exercise.name} | Date: {self.date}\033[0m"
 
     @property
     def user(self):
         return self._user
-
     @user.setter
     def user(self, user):
         if isinstance(user, User):
             self._user = user
         else:
-            raise Exception("Invalid user")
-
+            raise Exception("\033[31m Invalid user\033[0m")
     @property
     def exercise(self):
         return self._exercise
-
     @exercise.setter
     def exercise(self, exercise):
         if isinstance(exercise, Exercise):
             self._exercise = exercise
         else:
-            raise Exception("Invalid exercise")
-
+            raise Exception("\033[31m Invalid exercise\033[0m")
     @property
     def date(self):
         return self._date
-
     @date.setter
     def date(self, date):
         # Assuming date is a valid datetime object or string representation of a date
         self._date = date
-
     @classmethod
     def create_table(cls):
         """ Create a table to persist the attributes of Log instances """
@@ -71,7 +61,6 @@ class Log:
         """
         CURSOR.execute(sql)
         CONN.commit()
-
     @classmethod
     def drop_table(cls):
         """ Drop the table that persists Log instances """
@@ -130,17 +119,14 @@ class Log:
         """
         CURSOR.execute(sql, (self.id,))
         CONN.commit()
-
         # Delete the dictionary entry using id as the key
         del Log.all[self.id]
-
         # Set the id to None
         self.id = None
     
     @classmethod
     def instance_from_db(cls, row):
         """ Return a Log object having the attribute values from the table row """
-
         # Check the dictionary for an existing instance using the row's primary key
         # log = Log.all.get(row[0])
         # if log:
@@ -169,7 +155,6 @@ class Log:
             Log.all[log.id] = log
         return log
     
-
     @classmethod
     def get_all(cls):
         """ Return a list containing a Log object per row in the table """
@@ -179,7 +164,7 @@ class Log:
         """
         rows = CURSOR.execute(sql).fetchall()
         i = 0
-        print("ID | Date | User | Exercise")
+        print("\033[35m ID | Date | User | Exercise \033[0m")
         while i < len(rows):
             print(f"{rows[i][0]} | {rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
             i += 1
@@ -194,7 +179,6 @@ class Log:
             FROM logs
             WHERE id = ?
         """
-
         row = CURSOR.execute(sql, (id, )).fetchone()
 
         return Log.instance_from_db(row) if row else None
@@ -207,29 +191,40 @@ class Log:
             FROM logs
             WHERE user = ?
         """
-
-        rows = CURSOR.execute(sql, (name, )).fetchall()
         
-        i = 0
-        print("Date | User | Exercise")
-        while i < len(rows):
-            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
-            i += 1
+#         rows = CURSOR.execute(sql, (name, )).fetchall()
+        
+#         i = 0
+#         print("Date | User | Exercise")
+#         while i < len(rows):
+#             print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
+#             i += 1
+  
+        row = CURSOR.execute(sql, (name, )).fetchall()
+
+        return Log.instance_from_db(row) if row else None
+
+    @classmethod
+    def find_by_exercise(cls, exercise):
+        """Return a list of logs associated with the given exercise."""
+        sql = """
+            SELECT *
+            FROM logs
+            WHERE exercise_id = ?
+        """
+        rows = CURSOR.execute(sql, (exercise.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]
+
     
     @classmethod
-    def find_by_user_id(cls, id):
-        """ Return a Log object corresponding to the table row matching the specified primary key """
+    def find_by_user(cls, user):
+        """Return a list of logs associated with the given user."""
         sql = """
             SELECT *
             FROM logs
             WHERE user_id = ?
         """
+        rows = CURSOR.execute(sql, (user.id,)).fetchall()
+        return [Log.instance_from_db(row) for row in rows]
 
-        rows = CURSOR.execute(sql, (id, )).fetchall()
-        
-        i = 0
-        print("Date | User | Exercise")
-        while i < len(rows):
-            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
-            i += 1
-    
+
