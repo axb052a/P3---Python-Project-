@@ -302,7 +302,7 @@ def delete_log_by_id():
         print(f"\033[31mInvalid Log ID: {log_id}\033[0m")
 
 def exit_program():
-    print("\033[37mSee you next time for another workout! {waving_emoji} \033[0m")
+    print(f"\033[37mSee you next time for another workout! {waving_emoji} \033[0m")
     exit()
     
 def show_popular():
@@ -357,9 +357,6 @@ def get_my_info():
     my_info = User.find_by_id(logged_in_user_id[0])
     print("\033[35mID | User | Height | Weight (lbs)\033[0m")
     print(my_info)
-
-    # Display the most recent workout for the user
-    get_user_recent_workout(my_info)
     
 def get_user_workout_history():
     print(f"{open}Get User Workout History{close}")
@@ -471,37 +468,79 @@ def update_user_info_and_logs():
     # Create a copy of the user before the update for reference
     old_user = copy.deepcopy(user)
 
-    # Collect updates for user information
-    name = input(f"{open}New Name: {close}")
-    height_ft = input(f"{open}New Height (feet): {close}")
-    height_inches = input(f"{open}New Height (inches): {close}")
-    weight = input(f"{open}New Weight (lbs): {close}")
-
-    # Update user instance
-    user.name = name
-    user.height_ft = int(height_ft)
-    user.height_inches = int(height_inches)
-    user.weight = int(weight)
-
     try:
+        # Collect updates for user information with validation
+        name = input(f"{open}New Name: {close}")
+        if not (isinstance(name, str) and 0 < len(name) <= 20):
+            raise ValueError("Name must be greater than 0 and less than or equal to 20 characters.")
+
+        height_ft = input(f"{open}New Height (feet): {close}")
+        height_inches = input(f"{open}New Height (inches): {close}")
+        weight = input(f"{open}New Weight (lbs): {close}")
+
+        # Validate height_ft, height_inches, and weight inputs
+        height_ft = int(height_ft)
+        height_inches = int(height_inches)
+        weight = int(weight)
+
+        if not (0 < height_ft <= 10):  # Adjust the range according to your application
+            raise ValueError("Invalid height (feet). Please enter a value between 1 and 10.")
+        
+        if not (0 < height_inches < 12):
+            raise ValueError("Invalid height (inches). Please enter a value between 1 and 11.")
+        
+        if not (0 < weight <= 1000):  # Adjust the range according to your application
+            raise ValueError("Invalid weight. Please enter a value between 1 and 1000.")
+
+        # Update user instance
+        user.name = name
+        user.height_ft = height_ft
+        user.height_inches = height_inches
+        user.weight = weight
+
         # Update user in the database
         user.update()
         print(f"\033[32mUser information updated successfully!\033[0m")
+
+        # Update corresponding log entries
+        logs = Log.find_by_user(old_user)  # Find logs associated with the old user instance
+        for log in logs:
+            try:
+                # Create a copy of the log before the update
+                old_log = copy.deepcopy(log)
+
+                # Update log entry with the new user information
+                log.user = user
+                log.update()
+
+            except Exception as exc:
+                print(f"\033[31mError updating log entry: {exc}\033[0m")
+
+    except ValueError as ve:
+        print(f"\033[31mError updating user information: {ve}\033[0m")
     except Exception as exc:
         print(f"\033[31mError updating user information: {exc}\033[0m")
+
+def display_recent_workout():
+    print(f"{open}Most Recent Workout{close}")
+    user_id = logged_in_user_id[0]
+    user = User.find_by_id(user_id)
+
+    if not user:
+        print("\033[31mUser not found\033[0m")
         return
 
-    # Update corresponding log entries
-    logs = Log.find_by_user(old_user)  # Find logs associated with the old user instance
-    for log in logs:
-        try:
-            # Create a copy of the log before the update
-            old_log = copy.deepcopy(log)
-
-            # Update log entry with the new user information
-            log.user = user
-            log.update()
-
-        except Exception as exc:
-            print(f"\033[31mError updating log entry: {exc}\033[0m")
-
+    # Find the most recent workout log for the user
+    recent_log = None
+    recent_date = None
+    
+    for log in Log.find_by_user(user):
+        if recent_date is None or log.date > recent_date:
+            recent_log = log
+            recent_date = log.date
+    
+    if recent_log:
+        print(f"{open}Date: {recent_log.date}{close}")
+        print(f"{open}Exercise: {recent_log.exercise.name}{close}")
+    else:
+        print("\033[31mNo workout history found for this user.\033[0m")

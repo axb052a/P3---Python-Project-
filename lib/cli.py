@@ -17,10 +17,10 @@ from helpers import (
     show_popular,
     least_popular,
     list_users,
-    create_user,
+    # create_user,
     login_user,
     # get_user_logs,
-    get_user_recent_workout,
+    display_recent_workout,
     get_user_workout_history,
     update_user_info_and_logs,
     delete_user_with_logs,
@@ -39,14 +39,13 @@ def main():
                 user_menu()
             except:
                 print("\033[31mLogin error. Please try again.\n[x] Return to menu\033[0m")
-     
             while True:
                 choice = input("\033[33m> \033[0m")
                 if choice == "1":
                     get_my_info()
                 elif choice == "2":
                     print("\033[36mMy Stats\033[0m")
-                    get_user_recent_workout() 
+                    display_recent_workout()
                 elif choice == "3":
                     get_user_workout_history()
                 elif choice == "4":
