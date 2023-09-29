@@ -16,7 +16,7 @@ class User:
         self.workouts = []
     
     def __repr__(self):
-        return f"{self.id} | {self.name} | {self.height_ft}\'{self.height_inches}\" | {self.weight}"
+        return f"\033[35m{self.id} | {self.name} | {self.height_ft}\'{self.height_inches}\" | {self.weight}\033[0m"
     # def get_all_users(conn):
     #     cursor = conn.execute('SELECT * FROM Users')
     #     return cursor.fetchall()

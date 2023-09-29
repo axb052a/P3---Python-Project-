@@ -146,8 +146,8 @@ def find_most_and_least_popular_exercises():
     print(f"{open}The least popular exercise is: {least_popular_exercise} with {exercise_popularity[least_popular_exercise]} log entries.{close}")
     
 def delete_exercise_with_logs():
-    print("Delete Exercise with Logs")
-    name_or_id = input("Exercise or ID: ")
+    print(f"{open}Delete Exercise with Logs{close}")
+    name_or_id = input(f"{open}Exercise or ID: {close}")
 
     try:
         id_ = int(name_or_id)
@@ -163,9 +163,9 @@ def delete_exercise_with_logs():
 
         # Delete the exercise itself
         Exercise.delete(exercise)
-        print(f"{exercise.name} and its associated logs have been deleted")
+        print(f"\033[32m{exercise.name} and its associated logs have been deleted\033[0m")
     else:
-        print(f"Exercise {name_or_id} not found")
+        print(f"\033[31mExercise {name_or_id} not found\033[0m")
     
 def create_log():
     print(f"{open} New Workout Entry{close}")
@@ -182,7 +182,7 @@ def create_log():
             exercise_instance = Exercise.find_by_name(exercise_identifier.title())
 
         if not exercise_instance:
-            print("Invalid exercise. Please enter a valid exercise ID or name.")
+            print("\033[31mInvalid exercise. Please enter a valid exercise ID or name.\033[0m")
         else:
             # Create the log with the valid exercise
             log = Log.create(user_instance, exercise_instance, date)
@@ -287,11 +287,11 @@ def list_users():
 #             print("Error creating new user: ", exc)
 
 def create_user():
-    print("Register new user")
-    name = input("Name: ")
-    height_ft = input("Height (feet): ")
-    height_inches = input("Height (inches): ")
-    weight = input("Weight (lbs): ")
+    print(f"{open}Register new user{close}")
+    name = input(f"{open}Name: {close}")
+    height_ft = input(f"{open}Height (feet): {close}")
+    height_inches = input(f"{open}Height (inches): {close}")
+    weight = input(f"{open}Weight (lbs): {close}")
 
     try:
         # Convert height to feet and inches
@@ -299,10 +299,10 @@ def create_user():
         height_inches = int(height_inches)
 
         user = User.create_user(name, height_ft, height_inches, weight)
-        print(f"Welcome to PyFit, {user.name}!")
+        print(f"\033[37mWelcome to PyFit, {user.name}!\033[0m")
         logged_in_user_id[0] = user.id
     except Exception as exc:
-        print("Error creating new user: ", exc)
+        print("\033[31mError creating new user: \033[0m", exc)
 
 
 def login_user():
@@ -346,8 +346,8 @@ def get_my_info():
     get_user_recent_workout(my_info)
     
 def get_user_workout_history():
-    print("Get User Workout History")
-    user_name_or_id = input("Enter user's name or ID: ")
+    print(f"{open}Get User Workout History{close}")
+    user_name_or_id = input(f"{open}Enter user's name or ID: {close}")
 
     try:
         # Try to convert the input to an integer; if successful, it's an ID.
@@ -357,33 +357,33 @@ def get_user_workout_history():
         if user:
             logs = Log.find_by_user(user)
             if logs:
-                print(f"Workout History for {user.name}")
-                print("Date | Exercise")
+                print(f"{open}Workout History for {user.name}{close}")
+                print("\033[35mDate | Exercise\033[0m")
                 for log in logs:
-                    print(f"{log.date} | {log.exercise.name}")
+                    print(f"\033[35m{log.date} | {log.exercise.name}\033[0m")
             else:
-                print(f"No workout history found for {user.name}")
+                print(f"\033[31mNo workout history found for {user.name}\033[0m")
         else:
-            print(f"User with ID {user_identifier} not found")
+            print(f"\033[31mUser with ID {user_identifier} not found\033[0m")
     except ValueError:
         # If the input couldn't be converted to an integer, assume it's a name.
         user = User.find_by_name(user_name_or_id)
         if user:
             logs = Log.find_by_user(user)
             if logs:
-                print(f"Workout History for {user.name}")
-                print("Date | Exercise")
+                print(f"{open}Workout History for {user.name}{close}")
+                print("\033[35mDate | Exercise\033[0m")
                 for log in logs:
-                    print(f"{log.date} | {log.exercise.name}")
+                    print(f"\033[35m{log.date} | {log.exercise.name}\033[0m")
             else:
-                print(f"No workout history found for {user.name}")
+                print(f"\033[31mNo workout history found for {user.name}\033[0m")
         else:
-            print(f"User '{user_name_or_id}' not found")
+            print(f"\033[31mUser '{user_name_or_id}' not found\033[0m")
     except Exception as exc:
-        print("Error getting workout history:", exc)
+        print("\033[31mError getting workout history:\033[0m", exc)
         
 def get_user_recent_workout(user):
-    print(f"Most Recent Workout for {user.name}")
+    print(f"{open}Most Recent Workout for {user.name}{close}")
     
     # Find the most recent workout log for the user
     recent_log = None
@@ -395,8 +395,8 @@ def get_user_recent_workout(user):
             recent_date = log.date
     
     if recent_log:
-        print(f"Date: {recent_log.date}")
-        print(f"Exercise: {recent_log.exercise.name}")
+        print(f"{open}Date: {recent_log.date}{close}")
+        print(f"{open}Exercise: {recent_log.exercise.name}{close}")
     else:
-        print("No workout history found for this user.")
+        print("\033[31mNo workout history found for this user.\033[0m")
 
