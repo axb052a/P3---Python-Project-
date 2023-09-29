@@ -9,7 +9,8 @@ from helpers import (
     list_exercises,
     get_exercise_by_name_or_id,
     update_exercise_by_name_or_id,
-    delete_exercise_by_name_or_id,
+    # delete_exercise_by_name_or_id,
+    delete_exercise_with_logs,
     create_log, 
     list_logs,
     get_log_by_id,
@@ -20,7 +21,9 @@ from helpers import (
     list_users,
     create_user,
     login_user,
-    get_user_logs,
+    # get_user_logs,
+    get_user_recent_workout,
+    get_user_workout_history,
     get_my_info
 )
 
@@ -43,8 +46,10 @@ def main():
                     get_my_info()
                 elif choice == "2":
                     print("My Stats")
+                    get_user_recent_workout()
                 elif choice == "3":
-                    get_user_logs()
+                    # get_user_logs()
+                    get_user_workout_history()
                 elif choice == "4":
                     print("All Users")
                     list_users()
@@ -67,7 +72,8 @@ def main():
                 elif choice == "4":
                     update_exercise_by_name_or_id()                    
                 elif choice == "5":
-                    delete_exercise_by_name_or_id()
+                    # delete_exercise_by_name_or_id()
+                    delete_exercise_with_logs()
                 elif choice == "6":
                     create_exercise()
                 elif choice == "x":
@@ -81,16 +87,14 @@ def main():
                 if choice == "1":
                     list_logs()
                 elif choice == "2":
-                    print("Log Entries")
-                elif choice == "3":
                     # log_id = input("Enter the log ID: ")
                     # get_log_by_id(log_id) 
                     get_log_by_id() 
-                elif choice == "4":
+                elif choice == "3":
                     update_log_by_id() 
-                elif choice == "5":
+                elif choice == "4":
                     delete_log_by_id()      
-                elif choice == "6":
+                elif choice == "5":
                     create_log()
                 elif choice == "x":
                     main()
@@ -127,11 +131,10 @@ def exercise_menu():
 def log_menu():
     print("Please select an option:")
     print("[1] Log History")
-    print("[2] Log Entries")
-    print("[3] Search for Log")
-    print("[4] Update Log")  
-    print("[5] Delete Log")      
-    print("[6] Create Log")
+    print("[2] Search for Log")
+    print("[3] Update Log")  
+    print("[4] Delete Log")      
+    print("[5] Create Log")
     print("[x] Return to Home")
 
 runner = """
