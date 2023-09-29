@@ -4,9 +4,9 @@ from models.exercise import Exercise
 from models.log import Log
 from models.user import User
 
-from rich import print
-from rich.console import Console
-from rich.table import Table
+# from rich import print
+# from rich.console import Console
+# from rich.table import Table
 
 logged_in_user_id = [0]
 open = "\033[34m"
@@ -117,23 +117,23 @@ def collect_updates(exercise):
         exercise.update()
         print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
 
-def delete_exercise_by_name_or_id():
-    print("Delete Exercise")
-    name_or_id = input("Exercise or ID: ")
-    deleted_exercise = "deleted exercise"
+# def delete_exercise_by_name_or_id():
+#     print("Delete Exercise")
+#     name_or_id = input("Exercise or ID: ")
+#     deleted_exercise = "deleted exercise"
 
-    try:
-        id_ = int(name_or_id)
-        exercise = Exercise.find_by_id(id_)
-        Exercise.delete(exercise)
-        print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
-    except:
-        try:
-            exercise = Exercise.find_by_name(name_or_id.title())
-            Exercise.delete(exercise)
-            print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
-        except Exception as exc:
-            print("Error deleting exercise")
+#     try:
+#         id_ = int(name_or_id)
+#         exercise = Exercise.find_by_id(id_)
+#         Exercise.delete(exercise)
+#         print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
+#     except:
+#         try:
+#             exercise = Exercise.find_by_name(name_or_id.title())
+#             Exercise.delete(exercise)
+#             print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
+#         except Exception as exc:
+#             print("Error deleting exercise")
             
 def find_most_and_least_popular_exercises():
     # Get a list of all exercises
@@ -154,21 +154,50 @@ def find_most_and_least_popular_exercises():
     print(f"The most popular exercise is: {most_popular_exercise} with {exercise_popularity[most_popular_exercise]} log entries.")
     print(f"The least popular exercise is: {least_popular_exercise} with {exercise_popularity[least_popular_exercise]} log entries.")
     
+def delete_exercise_with_logs():
+    print("Delete Exercise with Logs")
+    name_or_id = input("Exercise or ID: ")
+
+    try:
+        id_ = int(name_or_id)
+        exercise = Exercise.find_by_id(id_)
+    except ValueError:
+        exercise = Exercise.find_by_name(name_or_id.title())
+
+    if exercise:
+        # Find and delete logs associated with the exercise
+        logs = Log.find_by_exercise(exercise)
+        for log in logs:
+            Log.delete(log)
+
+        # Delete the exercise itself
+        Exercise.delete(exercise)
+        print(f"{exercise.name} and its associated logs have been deleted")
+    else:
+        print(f"Exercise {name_or_id} not found")
+    
 def create_log():
     print("New Workout Entry")
     try:
         user_id = input("User ID: ")
-        exercise_id = input("Exercise ID: ")
+        exercise_identifier = input("Exercise ID or Name: ")
         date = input("Date (YYYY-MM-DD): ")
 
         user_instance = User.find_by_id(user_id)
-        exercise_instance = Exercise.find_by_id(exercise_id)
 
-        log = Log.create(user_instance, exercise_instance, date)
-        print("Log created successfully.")
+        # Check if the exercise exists either by ID or name
+        exercise_instance = Exercise.find_by_id(exercise_identifier)
+        if not exercise_instance:
+            exercise_instance = Exercise.find_by_name(exercise_identifier.title())
 
+        if not exercise_instance:
+            print("Invalid exercise. Please enter a valid exercise ID or name.")
+        else:
+            # Create the log with the valid exercise
+            log = Log.create(user_instance, exercise_instance, date)
+            print(f"{log} created successfully.")
     except Exception as exc:
-        print("Error creating new log: ", exc)
+        print("Error creating new log:", exc)
 
 def list_logs():
     print("Logs")
@@ -241,33 +270,52 @@ def list_users():
     for user in users:
         print(user)
 
+# def create_user():
+#     print("Register new user")
+#     name = input("Name: ")
+    
+#     try:
+#         search_for_user = User.find_by_name(name)
+#         if search_for_user.name == name:
+#             print(f"Error creating new user. User already exists.\nWelcome back, {search_for_user.name}!")
+#             logged_in_user_id[0] = search_for_user.id
+
+#     except:
+#         height = input("Height (inches): ")
+#         weight = input("Weight (lbs): ")
+#         # Convert height to feet and inches
+#         height = int(height)
+#         height_ft = round(height/12)
+#         height_inches = height - height_ft * 12
+
+#         weight = int(weight)
+
+#         try:
+            
+#             user = User.create_user(name, height_ft, height_inches, weight)
+#             print(f"Welcome to PyFit, {user.name}!")
+#             logged_in_user_id[0] = user.id
+#         except Exception as exc:
+#             print("Error creating new user: ", exc)
+
 def create_user():
     print("Register new user")
     name = input("Name: ")
-    
+    height_ft = input("Height (feet): ")
+    height_inches = input("Height (inches): ")
+    weight = input("Weight (lbs): ")
+
     try:
-        search_for_user = User.find_by_name(name)
-        if search_for_user.name == name:
-            print(f"Error creating new user. User already exists.\nWelcome back, {search_for_user.name}!")
-            logged_in_user_id[0] = search_for_user.id
-
-    except:
-        height = input("Height (inches): ")
-        weight = input("Weight (lbs): ")
         # Convert height to feet and inches
-        height = int(height)
-        height_ft = round(height/12)
-        height_inches = height - height_ft * 12
+        height_ft = int(height_ft)
+        height_inches = int(height_inches)
 
-        weight = int(weight)
+        user = User.create_user(name, height_ft, height_inches, weight)
+        print(f"Welcome to PyFit, {user.name}!")
+        logged_in_user_id[0] = user.id
+    except Exception as exc:
+        print("Error creating new user: ", exc)
 
-        try:
-            
-            user = User.create_user(name, height_ft, height_inches, weight)
-            print(f"Welcome to PyFit, {user.name}!")
-            logged_in_user_id[0] = user.id
-        except Exception as exc:
-            print("Error creating new user: ", exc)
 
 def login_user():
     print("Login User")
@@ -285,19 +333,84 @@ def login_user():
     else:
         print("Invalid menu selection")
 
-def get_user_logs():
-    print("Get User Logs")
-    name = input("Name: ")
-    try:
-        log = Log.find_by_name(name)
-        print(f"Date | User | Exercise\n{log.date} | {log.user.name} | {log.exercise.name}") if log else print(f"Logs for {name} not found")
-    except:
-        print(f"Invalid name")
+# def get_user_logs():
+#     print("Get User Logs")
+#     name = input("Name: ")
+#     try:
+#         log = Log.find_by_name(name)
+#         print(f"Date | User | Exercise\n{log.date} | {log.user.name} | {log.exercise.name}") if log else print(f"Logs for {name} not found")
+#     except:
+#         print(f"Invalid name")
+
+# def get_my_info():
+#     print("My Info")
+#     my_info = User.find_by_id(logged_in_user_id[0])
+#     print("ID | User | Height | Weight (lbs)")
+#     print(my_info)
 
 def get_my_info():
     print("My Info")
     my_info = User.find_by_id(logged_in_user_id[0])
     print("ID | User | Height | Weight (lbs)")
     print(my_info)
+
+    # Display the most recent workout for the user
+    get_user_recent_workout(my_info)
+    
+def get_user_workout_history():
+    print("Get User Workout History")
+    user_name_or_id = input("Enter user's name or ID: ")
+
+    try:
+        # Try to convert the input to an integer; if successful, it's an ID.
+        user_identifier = int(user_name_or_id)
+
+        user = User.find_by_id(user_identifier)
+        if user:
+            logs = Log.find_by_user(user)
+            if logs:
+                print(f"Workout History for {user.name}")
+                print("Date | Exercise")
+                for log in logs:
+                    print(f"{log.date} | {log.exercise.name}")
+            else:
+                print(f"No workout history found for {user.name}")
+        else:
+            print(f"User with ID {user_identifier} not found")
+    except ValueError:
+        # If the input couldn't be converted to an integer, assume it's a name.
+        user = User.find_by_name(user_name_or_id)
+        if user:
+            logs = Log.find_by_user(user)
+            if logs:
+                print(f"Workout History for {user.name}")
+                print("Date | Exercise")
+                for log in logs:
+                    print(f"{log.date} | {log.exercise.name}")
+            else:
+                print(f"No workout history found for {user.name}")
+        else:
+            print(f"User '{user_name_or_id}' not found")
+    except Exception as exc:
+        print("Error getting workout history:", exc)
+        
+def get_user_recent_workout(user):
+    print(f"Most Recent Workout for {user.name}")
+    
+    # Find the most recent workout log for the user
+    recent_log = None
+    recent_date = None
+    
+    for log in Log.find_by_user(user):
+        if recent_date is None or log.date > recent_date:
+            recent_log = log
+            recent_date = log.date
+    
+    if recent_log:
+        print(f"Date: {recent_log.date}")
+        print(f"Exercise: {recent_log.exercise.name}")
+    else:
+        print("No workout history found for this user.")
+
 
     
