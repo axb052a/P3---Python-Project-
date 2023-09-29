@@ -20,18 +20,18 @@ def create_exercise():
                 name = name.title()
                 break
         except:
-            raise Exception("Name must be greater than 0 and less than or equal to 20 characters.")   
+            raise Exception("\033[31mName must be greater than 0 and less than or equal to 20 characters.\033[0m")   
     while True:
         try:
-            time = int(input("Duration (in minutes): "))
+            time = int(input(f"{open}Duration (in minutes): {close}"))
             if 0 < time:
                 time
                 break
         except ValueError:
-            print("Duration must be a number") 
+            print("\033[31mDuration must be a number\033[0m") 
     while True:
         try:
-            category = input("Choose a category [1] Cardio, [2] Strength: ")
+            category = input(f"{open}Choose a category [1] Cardio, [2] Strength: {close}")
             if category.title() in Exercise.CATEGORY:
                 category = category.title()
                 break
@@ -39,10 +39,10 @@ def create_exercise():
                 category = Exercise.CATEGORY[int(category) - 1]
                 break
         except ValueError:
-            print("Enter a number or choose category that corresponds to the exercise category")  
+            print("\033[31mEnter a number or choose category that corresponds to the exercise category\033[0m")  
     while True:
         try:
-            intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
+            intensity = input(f"{open}Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): {close}")
             if intensity.title() in Exercise.INTENSITY:
                 intensity = intensity.title()
                 break
@@ -50,21 +50,21 @@ def create_exercise():
                 intensity = Exercise.INTENSITY[int(intensity) -1]
                 break
         except ValueError:
-            print("Enter a number or choose level that corresponds to the exercise intensity")
+            print("\033[31mEnter a number or choose level that corresponds to the exercise intensity\033[0m")
     while True:
         try:
-            cals_burned = int(input("Calories Burned: "))
+            cals_burned = int(input(f"{open}Calories Burned: {close}"))
             if 0 < cals_burned:
                 cals_burned
                 break
         except ValueError:
-            print("Calories burned must be a number") 
+            print("\033[31mCalories burned must be a number\033[0m") 
     try:
         exercise = Exercise.create(name, time, category, intensity, cals_burned)
         if exercise.category == "Cardio":
-            print(f"Success: {exercise.name} is now available! {cardio_emoji}")
+            print(f"\033[32mSuccess: {exercise.name} is now available! {cardio_emoji}\033[0m")
         elif exercise.category == "Strength":
-            print(f"Success: {exercise.name} is now available! {strength_emoji}")
+            print(f"\033[32mSuccess: {exercise.name} is now available! {strength_emoji}\033[0m")
     except Exception as exc:
         print("\033[31m Error creating new exercise: \033[0m", exc)
 
@@ -113,18 +113,18 @@ def collect_updates(exercise):
                 exercise.name = name.title()
                 break
         except:
-            raise Exception("Name must be greater than 0 and less than or equal to 20 characters.")   
+            raise Exception("\033[31mName must be greater than 0 and less than or equal to 20 characters.\033[0m")   
     while True:
         try:
-            time = int(input("Duration (in minutes): "))
+            time = int(input(f"{open}Duration (in minutes): {close}"))
             if 0 < time:
                 exercise.time = time
                 break
         except ValueError:
-            print("Duration must be a number")   
+            print("\033[31mDuration must be a number\033[0m")   
     while True:
         try:
-            category = input("Choose a category [1] Cardio, [2] Strength: ")
+            category = input(f"{open}Choose a category [1] Cardio, [2] Strength: {close}")
             if category.title() in Exercise.CATEGORY:
                 exercise.category = category.title()
                 break
@@ -132,10 +132,10 @@ def collect_updates(exercise):
                 exercise.category = Exercise.CATEGORY[int(category) - 1]
                 break
         except ValueError:
-            print("Enter a number or choose category that corresponds to the exercise category")  
+            print("\033[31mEnter a number or choose category that corresponds to the exercise category\033[0m")  
     while True:
         try:
-            intensity = input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): ")
+            intensity = input(f"{open}Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): {close}")
             if intensity.title() in Exercise.INTENSITY:
                 exercise.intensity = intensity.title()
                 break
@@ -143,37 +143,37 @@ def collect_updates(exercise):
                 exercise.intensity = Exercise.INTENSITY[int(intensity) -1]
                 break
         except ValueError:
-            print("Enter a number or choose level that corresponds to the exercise intensity")
+            print("\033[31mEnter a number or choose level that corresponds to the exercise intensity\033[0m")
     while True:
         try:
-            cals_burned = int(input("Calories Burned: "))
+            cals_burned = int(input(f"{open}Calories Burned: {close}"))
             if 0 < cals_burned:
                 exercise.cals_burned = cals_burned
                 break
         except ValueError:
-            print("Calories burned must be a number")     
+            print("\033[31mCalories burned must be a number\033[0m")     
 
     """ Exercise instance updated in database with .update() """
     Exercise.update(exercise)
-    print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
+    print(f"\033[32m{exercise.name} has been updated!\033[0m") if exercise else print(f"\033[31mExercise {name} not found\033[0m")
 
 def delete_exercise_by_name_or_id():
-    print("Delete Exercise")
-    name_or_id = input("Exercise or ID: ")
+    print(f"{open}Delete Exercise{close}")
+    name_or_id = input(f"{open}Exercise or ID: {close}")
     deleted_exercise = "deleted exercise"
 
     try:
         id_ = int(name_or_id)
         exercise = Exercise.find_by_id(id_)
         Exercise.delete(exercise)
-        print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
+        print(f"\033[32m{exercise.name} has been deleted\033[0m") if exercise else print(f"\033[31mExercise {exercise.name} not found\033[0m")
     except:
         try:
             exercise = Exercise.find_by_name(name_or_id.title())
             Exercise.delete(exercise)
-            print(f"{exercise.name} has been deleted") if exercise else print(f"Exercise {exercise.name} not found")
+            print(f"\033[32m{exercise.name} has been deleted\033[0m") if exercise else print(f"\033[31mExercise {exercise.name} not found\033[0m")
         except Exception as exc:
-            print("Error deleting exercise")
+            print("\033[31mError deleting exercise\033[0m")
           
 def find_most_and_least_popular_exercises():
     # Get a list of all exercises
@@ -227,7 +227,7 @@ def create_log():
             exercise_instance = Exercise.find_by_name(exercise_id.title())
 
         if not exercise_instance:
-            print("Invalid exercise. Please enter a valid exercise ID or name.")
+            print("\033[31mInvalid exercise. Please enter a valid exercise ID or name.\033[0m")
         else:
             # Create the log with the valid exercise
             log = Log.create(user_instance, exercise_instance, date)
@@ -433,9 +433,9 @@ def delete_user_with_logs():
 
             # Delete the user itself
             User.delete(user)
-            print(f"{user.name} and their associated logs have been deleted")
+            print(f"\033[32m{user.name} and their associated logs have been deleted\033[0m")
         else:
-            print(f"User with ID {user_identifier} not found")
+            print(f"\033[31mUser with ID {user_identifier} not found\033[0m")
     except ValueError:
         # If the input couldn't be converted to an integer, assume it's a name.
         user = User.find_by_name(user_name_or_id)
@@ -447,11 +447,11 @@ def delete_user_with_logs():
 
             # Delete the user itself
             User.delete(user)
-            print(f"{user.name} and their associated logs have been deleted")
+            print(f"\033[32m{user.name} and their associated logs have been deleted\033[0m")
         else:
-            print(f"User '{user_name_or_id}' not found")
+            print(f"\033[31mUser '{user_name_or_id}' not found\033[0m")
     except Exception as exc:
-        print("Error deleting user and logs:", exc)
+        print("\033[31mError deleting user and logs:\033[0m", exc)
 
 import copy
 
@@ -465,7 +465,7 @@ def update_user_info_and_logs():
         return
 
     # Display current user information
-    print(f"Current User Information:")
+    print(f"{open}Current User Information:{close}")
     print(user)
 
     # Create a copy of the user before the update for reference
