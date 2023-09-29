@@ -223,13 +223,17 @@ def create_log():
         user_instance = User.find_by_id(user_id)
 
  # Something might need to be updated
-        log = Log.create(user_instance, exercise_instance, date)
-        print(f"Log created successfully. {congrats_emoji}")
+        # log = Log.create(user_instance, exercise_instance, date)
+        # print(f"Log created successfully. {congrats_emoji}")
 
         # Check if the exercise exists either by ID or name
-        exercise_instance = Exercise.find_by_id(exercise_identifier)
+        # exercise_instance = Exercise.find_by_id(exercise_identifier)
+        # if not exercise_instance:
+        #     exercise_instance = Exercise.find_by_name(exercise_identifier.title())
+
+        exercise_instance = Exercise.find_by_id(exercise_id)
         if not exercise_instance:
-            exercise_instance = Exercise.find_by_name(exercise_identifier.title())
+            exercise_instance = Exercise.find_by_name(exercise_instance.title())
 
 
         if not exercise_instance:
@@ -237,7 +241,7 @@ def create_log():
         else:
             # Create the log with the valid exercise
             log = Log.create(user_instance, exercise_instance, date)
-            print("\033[32m{log} created successfully.\033[0m")
+            print(f"\033[32mLog entry #{log.id} created successfully.\033[0m")
     except Exception as exc:
         print("\033[31mError creating new log: \033[0m", exc)
 
@@ -328,20 +332,20 @@ def create_user():
         print("\033[31mError creating new user: \033[0m", exc)
 
 def login_user():
-    print(f"{open}Login User{close}")
-    user_status = input(f"{open}New User? [y/n] {close}")
-    if user_status == "y":
-        create_user()
-    elif user_status == "n":
+    # print(f"{open}Login User{close}")
+    # user_status = input(f"{open}New User? [y/n] {close}")
+    # if user_status == "y":
+    #     create_user()
+    # elif user_status == "n":
         name = input(f"{open}Name: {close}")
         try:
             user = User.find_by_name(name)
             logged_in_user_id[0] = user.id
-            print(f"\033[37mWelcome back, {user.name}!\033[0m")
+            print(f"\033[37mWelcome back, {user.name} ({user.id})!\033[0m")
         except:
             raise Exception("\033[31mUnable to find user. Please try again.\033[0m")
-    else:
-        print("\033[31mInvalid menu selection\033[0m")
+    # else:
+        # print("\033[31mInvalid menu selection\033[0m")
 
 def get_my_info():
     print(f"{open}My Info{close}")
@@ -350,7 +354,7 @@ def get_my_info():
     print(my_info)
 
     # Display the most recent workout for the user
-    get_user_recent_workout(my_info)
+    # get_user_recent_workout(my_info) function no longer takes an arg
     
 def get_user_workout_history():
     print(f"{open}Get User Workout History{close}")
@@ -389,9 +393,11 @@ def get_user_workout_history():
     except Exception as exc:
         print("\033[31mError getting workout history:\033[0m", exc)
         
-def get_user_recent_workout(user):
+def get_user_recent_workout():
+    user = User.find_by_id(logged_in_user_id[0])
+
     print(f"{open}Most Recent Workout for {user.name}{close}")
-    
+
     # Find the most recent workout log for the user
     recent_log = None
     recent_date = None

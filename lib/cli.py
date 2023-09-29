@@ -7,7 +7,7 @@ from helpers import (
     list_exercises,
     get_exercise_by_name_or_id,
     update_exercise_by_name_or_id,
-    # delete_exercise_by_name_or_id,
+    delete_exercise_by_name_or_id,
     delete_exercise_with_logs,
     create_log, 
     list_logs,
@@ -71,11 +71,12 @@ def user_menu():
         if choice == "1":
             get_my_info()
         elif choice == "2":
-            print("My Stats")
+            get_user_recent_workout()
         elif choice == "3":
             create_log()
         elif choice == "4":
-            get_user_logs()
+            # get_user_logs()
+            get_user_workout_history()
         elif choice == "5":
             print("All Users")
             list_users()
