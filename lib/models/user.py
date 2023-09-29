@@ -16,7 +16,7 @@ class User:
         self.workouts = []
     
     def __repr__(self):
-        return f"{self.id} | {self.name} | {self.height_ft}\'{self.height_inches}\" | {self.weight}"
+        return f"\033[35m{self.id} | {self.name} | {self.height_ft}\'{self.height_inches}\" | {self.weight}\033[0m"
     # def get_all_users(conn):
     #     cursor = conn.execute('SELECT * FROM Users')
     #     return cursor.fetchall()
@@ -124,7 +124,6 @@ class User:
         user = cls(name, height_ft, height_inches, weight)
         user.save()
         return user
-    
     def update(self):
             """Update the table row corresponding to the current User instance."""
             sql = """
@@ -134,7 +133,6 @@ class User:
             """
             CURSOR.execute(sql, (self.name, self.height_ft, self.height_inches, self.weight, self.id))
             CONN.commit()
-    
     def delete(self):
             """Delete the table row corresponding to the current User instance"""
             sql = """
@@ -198,3 +196,4 @@ class User:
         """
         row = CURSOR.execute(sql, (name, )).fetchone()
         return User.instance_from_db(row) if row else None
+

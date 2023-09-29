@@ -5,21 +5,25 @@ from models.__init__ import CONN, CURSOR
 from models.exercise import Exercise
 from models.log import Log
 from models.user import User
+
 import ipdb
 
 def reset_database():
 
-     # Delete existing tables
+    # Delete existing tables
     Exercise.drop_table()
     Log.drop_table()
     User.drop_table()
+    
     # Create new tables
     Exercise.create_table()
     Log.create_table()
     User.create_table()
+    
     # Create seed data
     
     # Exercise instances
+
     treadmill = Exercise.create("Treadmill", 15, "Cardio", "Advanced", 200)
     weights = Exercise.create("Weights", 30, "Strength", "Intermediate", 150)
     walking = Exercise.create("Walking", 30, "Cardio", "Beginner", 100)
@@ -49,6 +53,7 @@ def reset_database():
     Log.create(charlie, push_ups, "2023-10-05")
     Log.create(alicia, push_ups, "2023-10-06")
     Log.create(charlie, push_ups, "2023-10-07")
+
 
 reset_database()
 ipdb.set_trace()

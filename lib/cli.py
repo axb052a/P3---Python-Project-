@@ -17,7 +17,7 @@ from helpers import (
     show_popular,
     least_popular,
     list_users,
-    # create_user,
+    create_user,
     login_user,
     # get_user_logs,
     get_user_recent_workout,
@@ -39,7 +39,7 @@ def main():
                 user_menu()
             except:
                 print("\033[31mLogin error. Please try again.\n[x] Return to menu\033[0m")
-        
+     
             while True:
                 choice = input("\033[33m> \033[0m")
                 if choice == "1":
@@ -103,8 +103,7 @@ def main():
                     main()
                 else:
                     print("\033[31mInvalid choice log_menu\033[0m")
-        else:
-            print("\033[31mInvalid choice\033[0m")
+                   
 
 def home_menu():
     print("\033[36mPlease select an option:\033[0m")
@@ -123,7 +122,6 @@ def user_menu():
     print("\033[36m[6] Delete an User\033[0m")
     print("\033[36m[x] Log Out\033[0m")
 
-
 def exercise_menu():
     print("\033[36mPlease select an option:\033[0m")
     print("\033[36m[1] Exercises\033[0m")
@@ -134,7 +132,6 @@ def exercise_menu():
     print("\033[36m[6] Create Exercise\033[0m")
     print("\033[36m[x] Return to Home\033[0m")
     
-
 def log_menu():
     print("\033[36mPlease select an option:\033[0m")
     print("\033[36m[1] Log History\033[0m")

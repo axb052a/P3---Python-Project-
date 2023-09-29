@@ -105,10 +105,10 @@ class Log:
         """ Update the table row corresponding to the current Log instance """
         sql = """
             UPDATE logs
-            SET user_id = ?, user = ?, exercise_id = ?, exercise = ?, date = ?
+            SET user_id = ?, exercise_id = ?, date = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.user.id, self.user.name, self.exercise.id, self.exercise.name, self.date, self.id))
+        CURSOR.execute(sql, (self.user.id, self.exercise.id, self.date, self.id))
         CONN.commit()
     
     def delete(self):
@@ -164,9 +164,9 @@ class Log:
         """
         rows = CURSOR.execute(sql).fetchall()
         i = 0
-        print("\033[35m Date | User | Exercise \033[0m")
+        print("\033[35m ID | Date | User | Exercise \033[0m")
         while i < len(rows):
-            print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
+            print(f"{rows[i][0]} | {rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
             i += 1
 
         # return [Log.instance_from_db(row) for row in rows]
@@ -191,7 +191,15 @@ class Log:
             FROM logs
             WHERE user = ?
         """
-
+        
+#         rows = CURSOR.execute(sql, (name, )).fetchall()
+        
+#         i = 0
+#         print("Date | User | Exercise")
+#         while i < len(rows):
+#             print(f"{rows[i][5]} | {rows[i][2]} | {rows[i][4]}")
+#             i += 1
+  
         row = CURSOR.execute(sql, (name, )).fetchall()
 
         return Log.instance_from_db(row) if row else None
@@ -206,6 +214,7 @@ class Log:
         """
         rows = CURSOR.execute(sql, (exercise.id,)).fetchall()
         return [Log.instance_from_db(row) for row in rows]
+
     
     @classmethod
     def find_by_user(cls, user):

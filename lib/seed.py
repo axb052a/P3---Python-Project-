@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 from models.__init__ import CONN, CURSOR
 from models.exercise import Exercise
@@ -49,5 +50,4 @@ def seed_database():
     
 seed_database()
 print("\033[32m Seeded database \033[0m")
-
 
