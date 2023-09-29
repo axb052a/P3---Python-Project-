@@ -10,10 +10,14 @@ close = "\33[0m"
 
 def create_exercise():
     print("Create Exercise")
-    name = input(f"{open} Enter Exercise: {close}")
-    while not isinstance(name, str) or len(name) >= 20:
-        print("Name must be greater than 0 and less than or equal to 20 characters.")
-        name = input("Exercise: ")   
+    while True:
+        try:
+            name = input(f"{open} Enter Exercise: {close}")
+            if isinstance(name, str) and 0 < len(name) <= 20:
+                name.title()
+                break
+        except:
+            raise Exception("Name must be greater than 0 and less than or equal to 20 characters.")   
     while True:
         try:
             time = int(input("Duration (in minutes): "))
@@ -26,7 +30,7 @@ def create_exercise():
         try:
             category = int(input("Choose a category [1] Cardio, [2] Strength: "))
             if category in range(1, len(Exercise.CATEGORY) +1):
-                category
+                category = Exercise.CATEGORY[category - 1]
                 break
         except ValueError:
             print("Enter a number that corresponds to the exercise category")
@@ -34,7 +38,7 @@ def create_exercise():
         try:
             intensity = int(input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): "))
             if intensity in range(1, len(Exercise.INTENSITY) +1):
-                intensity
+                intensity = Exercise.INTENSITY[intensity -1]
                 break
         except ValueError:
             print("Enter a number that corresponds to the exercise intensity")
@@ -91,27 +95,50 @@ def update_exercise_by_name_or_id():
             print("Error updating exercise", exc)
 
 def collect_updates(exercise):
-        # Update exercise instance
-        name = input(f"{exercise.name} new name: ")
-        exercise.name = name
-        time = input(f"{exercise.name} new time: ")
-        exercise.time = time
-        category = input(f"{exercise.name} new category (Cardio = 1, Strength = 2): ")
-        # exercise.category = category
-        intensity = input(f"{exercise.name} new intensity (Beginner = 1, Intermediate = 2, Advanced = 3): ")
-        # exercise.intensity = intensity
-        cals_burned = input(f"{exercise.name} new calories burned: ")
-        exercise.cals_burned = cals_burned
+    while True:
+        try:
+            name = input(f"{open} Update {exercise.name}: {close}")
+            if isinstance(name, str) and 0 < len(name) <= 20:
+                exercise.name = name.title()
+                break
+        except:
+            raise Exception("Name must be greater than 0 and less than or equal to 20 characters.")   
+    while True:
+        try:
+            time = int(input("Duration (in minutes): "))
+            if 0 < time:
+                exercise.time = time
+                break
+        except ValueError:
+            print("Duration must be a number")   
+    while True:
+        try:
+            category = int(input("Choose a category [1] Cardio, [2] Strength: "))
+            if category in range(1, len(Exercise.CATEGORY) +1):
+                exercise.category = Exercise.CATEGORY[category - 1]
+                break
+        except ValueError:
+            print("Enter a number that corresponds to the exercise category")
+    while True:
+        try:
+            intensity = int(input("Choose an intensity [1] Beginner, [2] Intermediate, [3] Advanced): "))
+            if intensity in range(1, len(Exercise.INTENSITY) +1):
+                exercise.intensity = Exercise.INTENSITY[intensity - 1]
+                break
+        except ValueError:
+            print("Enter a number that corresponds to the exercise intensity")
+    while True:
+        try:
+            cals_burned = int(input("Calories Burned: "))
+            if 0 < cals_burned:
+                exercise.cals_burned = cals_burned
+                break
+        except ValueError:
+            print("Calories burned must be a number")     
 
-        # Allow choices to be numbers
-        if category not in Exercise.CATEGORY and 0 < int(category) <= len(Exercise.CATEGORY):
-            exercise.category = Exercise.CATEGORY[int(category) - 1]
-        if intensity not in Exercise.INTENSITY and 0 < int(intensity) <= len(Exercise.INTENSITY):
-            exercise.intensity = Exercise.INTENSITY[int(intensity) -1]        
-
-        """ Exercise instance updated in database with .update() """
-        exercise.update()
-        print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
+    """ Exercise instance updated in database with .update() """
+    exercise.update()
+    print(f"{exercise.name} has been updated!") if exercise else print(f"Exercise {name} not found")
 
 def delete_exercise_by_name_or_id():
     print("Delete Exercise")
